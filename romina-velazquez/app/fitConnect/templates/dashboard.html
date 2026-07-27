@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitConnect - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+    
+    <!-- Navbar Superior -->
+    <nav class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center z-10">
+        <h1 class="text-xl font-bold tracking-wider text-orange-500">🏋️‍♂️ FitConnect</h1>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-slate-300">Hola, <b class="text-orange-400">{{ username }}</b></span>
+            <a href="/logout" class="bg-slate-700 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg transition">Salir</a>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal con Menú Lateral -->
+    <div class="flex flex-1">
+        
+        <!-- Menú Lateral -->
+        <aside class="w-64 bg-slate-800/50 border-r border-slate-700 p-4 space-y-2 hidden md:block">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-2">Menú Principal</p>
+            
+            <button onclick="mostrarSeccion('ejercicios')" id="btn-ejercicios" 
+                class="w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm transition duration-200 bg-orange-600 text-white flex items-center gap-3">
+                💪 Cargar Ejercicio
+            </button>
+            
+            <button onclick="mostrarSeccion('comunidad')" id="btn-comunidad" 
+                class="w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm transition duration-200 text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center gap-3">
+                👥 Ver Comunidad
+            </button>
+        </aside>
+
+        <!-- Área de Contenido Dinámico -->
+        <main class="flex-1 p-6 md:p-8 max-w-3xl mx-auto">
+            
+            <!-- SECCIÓN 1: Cargar y Ver Ejercicios -->
+            <section id="seccion-ejercicios" class="space-y-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-orange-400">💪 Cargar mi Ejercicio</h3>
+                    <form action="/exercises" method="POST" class="space-y-3">
+                        <input type="text" name="name" placeholder="Ejercicio (ej. Sentadillas)" required 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                        <div class="flex gap-2">
+                            <input type="number" name="sets" placeholder="Series" required 
+                                class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                            <input type="number" name="reps" placeholder="Reps" required 
+                                class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                            <input type="number" step="0.5" name="weight" placeholder="Peso (kg)" required 
+                                class="w-1/3 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-orange-500">
+                        </div>
+                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium py-2 rounded-lg transition duration-200">
+                            Guardar Ejercicio
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+                    <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Mis Ejercicios Registrados</h4>
+                    {% if exercises %}
+                        <ul class="space-y-2">
+                            {% for ex in exercises %}
+                                <li class="bg-slate-900 p-3 rounded-lg border border-slate-700/50 flex justify-between items-center text-sm">
+                                    <span class="font-medium text-slate-200">{{ ex.name }}</span>
+                                    <span class="text-xs text-orange-400 font-semibold">{{ ex.sets }} series x {{ ex.reps }} reps — {{ ex.weight }} kg</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-slate-500 text-sm text-center py-4">Todavía no registraste ningún ejercicio.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: Ver Comunidad (Oculta por defecto) -->
+            <section id="seccion-comunidad" class="hidden space-y-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold mb-2 text-orange-400">👥 Miembros de la Comunidad</h3>
+                    <p class="text-slate-400 text-sm mb-6">Listado de otros usuarios registrados que entrenan en el gimnasio.</p>
+                    
+                    {% if users %}
+                        <ul class="space-y-3">
+                            {% for u in users %}
+                                <li class="bg-slate-900 p-4 rounded-lg border border-slate-700/50 flex justify-between items-center">
+                                    <div>
+                                        <span class="font-medium text-slate-200 block">DNI: {{ u.username }}</span>
+                                        <span class="text-xs text-slate-500">{{ u.email }}</span>
+                                    </div>
+                                    <span class="bg-orange-500/10 text-orange-400 text-xs px-2.5 py-1 rounded-full border border-orange-500/20">Miembro activo</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-slate-500 text-sm text-center py-4">No hay otros miembros registrados todavía.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Script para alternar entre solapas del menú lateral -->
+    <script>
+        function mostrarSeccion(seccion) {
+            const secEjercicios = document.getElementById('seccion-ejercicios');
+            const secComunidad = document.getElementById('seccion-comunidad');
+            const btnEjercicios = document.getElementById('btn-ejercicios');
+            const btnComunidad = document.getElementById('btn-comunidad');
+
+            if (seccion === 'ejercicios') {
+                secEjercicios.classList.remove('hidden');
+                secComunidad.classList.add('hidden');
+                
+                btnEjercicios.className = "w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm transition duration-200 bg-orange-600 text-white flex items-center gap-3";
+                btnComunidad.className = "w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm transition duration-200 text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center gap-3";
+            } else {
+                secEjercicios.classList.add('hidden');
+                secComunidad.classList.remove('hidden');
+                
+                btnComunidad.className = "w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm transition duration-200 bg-orange-600 text-white flex items-center gap-3";
+                btnEjercicios.className = "w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm transition duration-200 text-slate-400 hover:bg-slate-800 hover:text-slate-200 flex items-center gap-3";
+            }
+        }
+    </script>
+</body>
+</html>
