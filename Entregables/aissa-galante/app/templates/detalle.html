@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ oportunidad.producto }} | Radar Tracker
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/styles.css') }}"
+    >
+</head>
+
+<body class="detail-page">
+
+    <!-- DETALLE DE OPORTUNIDAD
+
+         Esta pantalla representa el resultado individual
+         producido por el pipeline analítico de Radar Tracker.
+
+         En AWS, el resultado sería consultado desde DynamoDB
+         mediante Amazon API Gateway y AWS Lambda. -->
+
+    <main class="detail-container">
+
+        <a class="back-link" href="/">
+            ← Volver al dashboard
+        </a>
+
+        <header class="detail-header">
+
+            <div>
+                <p class="eyebrow">
+                    {{ oportunidad.categoria }}
+                </p>
+
+                <h1>{{ oportunidad.producto }}</h1>
+
+                <p class="subtitle">
+                    Análisis consolidado de Amazon SP-API,
+                    Keepa y Reddit.
+                </p>
+            </div>
+
+            <div class="detail-score">
+                <span>Opportunity Score</span>
+
+                <strong>{{ oportunidad.score }}</strong>
+
+                <progress
+                    class="detail-score-progress"
+                    value="{{ oportunidad.score }}"
+                    max="100"
+                    aria-label="Opportunity Score {{ oportunidad.score }} de 100"
+                >
+                    {{ oportunidad.score }}%
+                </progress>
+            </div>
+
+        </header>
+
+        <section class="detail-metrics">
+
+            <article>
+                <span>ASIN</span>
+                <strong>{{ oportunidad.asin }}</strong>
+            </article>
+
+            <article>
+                <span>Precio</span>
+                <strong>
+                    USD {{ "%.2f"|format(oportunidad.precio) }}
+                </strong>
+            </article>
+
+            <article>
+                <span>Competencia</span>
+                <strong>{{ oportunidad.competencia }}</strong>
+            </article>
+
+            <article>
+                <span>Rating</span>
+                <strong>{{ oportunidad.rating }}</strong>
+            </article>
+
+            <article>
+                <span>Reviews negativas</span>
+                <strong>{{ oportunidad.reviews_negativas }}%</strong>
+            </article>
+
+            <article>
+                <span>Calidad SEO</span>
+                <strong>{{ oportunidad.seo }}</strong>
+            </article>
+
+        </section>
+
+        <section class="detail-grid">
+
+            <article class="detail-panel">
+
+                <p class="eyebrow">
+                    Amazon Bedrock
+                </p>
+
+                <h2>
+                    Insight generado por IA
+                </h2>
+
+                <p class="detail-text">
+                    {{ oportunidad.insight }}
+                </p>
+
+            </article>
+
+            <article class="detail-panel recommendation-panel">
+
+                <p class="eyebrow">
+                    Recomendación
+                </p>
+
+                <h2>
+                    Estrategia sugerida
+                </h2>
+
+                <p class="detail-text">
+                    {{ oportunidad.recomendacion }}
+                </p>
+
+            </article>
+
+            <article class="detail-panel score-factors-panel">
+                        
+                <p class="eyebrow">
+                    Opportunity Scoring
+                </p>
+            
+                <h2>
+                    Factores analizados
+                </h2>
+            
+                <div class="score-factor-list">
+                
+                    {% for factor in oportunidad.factores_score %}
+                
+                    <div class="score-factor-item">
+                    
+                        <span class="factor-check">✓</span>
+                    
+                        <span class="factor-name">
+                            {{ factor.nombre }}
+                        </span>
+                    
+                        <strong class="factor-value">
+                            {{ factor.valor }}
+                        </strong>
+                    
+                    </div>
+                
+                    {% endfor %}
+                
+                </div>
+            
+                <div class="final-score-row">
+                
+                    <span>Score final</span>
+                
+                    <strong>
+                        {{ oportunidad.score }}
+                    </strong>
+                
+                </div>
+            
+            </article>
+        
+        
+        </section>
+
+        <section class="detail-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">
+                        Procesamiento
+                    </p>
+
+                    <h2>
+                        Servicios que generaron el análisis
+                    </h2>
+                </div>
+            </div>
+
+            <div class="detail-pipeline">
+
+                <span>EventBridge</span>
+                <span>SQS</span>
+                <span>Lambda/Fargate</span>
+                <span>Amazon S3</span>
+                <span>Step Functions</span>
+                <span>AWS Glue</span>
+                <span>Amazon Athena</span>
+                <span>Amazon Bedrock</span>
+                <span>Lambda Scoring</span>
+                <span>Amazon DynamoDB</span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
