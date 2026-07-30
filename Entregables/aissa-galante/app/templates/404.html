@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Página no encontrada | Radar Tracker</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/styles.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="error-page">
+
+        <section class="error-card">
+
+            <p class="eyebrow">
+                Error 404
+            </p>
+
+            <h1>
+                Página no encontrada
+            </h1>
+
+            <p>
+                La página que intentaste abrir no existe o fue movida.
+            </p>
+
+            <a class="error-button" href="{{ url_for('dashboard') }}">
+                Volver al dashboard
+            </a>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Tracker | Oportunidades</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/styles.css') }}"
+    >
+</head>
+
+<body>
+    <!-- RADAR TRACKER - DASHBOARD PRINCIPAL
+
+     Esta pantalla representa la capa de consumo de la arquitectura
+     serverless diseñada en AWS.
+     El usuario consulta las oportunidades de negocio previamente
+     procesadas por el pipeline de análisis. Los datos mostrados en
+     este dashboard simulan la información almacenada en Amazon
+     DynamoDB y expuesta mediante Amazon API Gateway y AWS Lambda.
+
+     Flujo representado:
+
+     Amazon SP-API / Keepa / Reddit
+                 │
+                 ▼
+           EventBridge
+                 ▼
+               Amazon SQS
+                 ▼
+        AWS Lambda / Fargate
+                 ▼
+        Amazon S3 (Data Lake)
+                 ▼
+         AWS Step Functions
+                 ▼
+      AWS Glue → Amazon Athena
+                 ▼
+           Amazon Bedrock
+                 ▼
+     Opportunity Analysis (Lambda)
+                 ▼
+          Amazon DynamoDB
+                 ▼
+       API Gateway + Lambda
+                 ▼
+           Frontend Dashboard
+
+     El Dashboard muestra las oportunidades detectadas, el
+     Opportunity Score y permite acceder al detalle de cada una.-->
+    <div class="app-shell">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark">RT</span>
+
+                <div>
+                    <h1>Radar Tracker</h1>
+                    <p>Opportunity Intelligence</p>
+                </div>
+            </div>
+
+            <nav class="navigation">
+                <a class="nav-link active" href="/">
+                    Dashboard
+                </a>
+
+                <a class="nav-link" href="#oportunidades">
+                    Oportunidades
+                </a>
+
+                <a class="nav-link" href="#pipeline">
+                    Pipeline AWS
+                </a>
+            </nav>
+            
+            <div class="sidebar-status">
+                <span class="status-dot"></span>
+                
+                <div>
+                    <strong>Pipeline operativo</strong>
+                    <small>Última actualización: hoy</small>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- ESTADO TÉCNICO DEL SISTEMA
+                Resume la región propuesta en AWS, la última ejecución
+                simulada del pipeline y su estado operativo. 
+            -->
+
+            <section class="system-status-bar">
+            
+                <div class="system-status-item">
+                    <span>AWS Region</span>
+                    <strong>us-east-1</strong>
+                </div>
+            
+                <div class="system-status-item">
+                    <span>Última ejecución</span>
+                    <strong>18:35 hs</strong>
+                </div>
+            
+                <div class="system-status-item">
+                    <span>Pipeline</span>
+                
+                    <strong class="healthy-status">
+                        <span class="healthy-dot"></span>
+                        Healthy
+                    </strong>
+                </div>
+            
+            </section>
+
+
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">RADAR TRACKER</p>
+                    <h2>Amazon FBA Opportunity Intelligence Platform</h2>
+                    <p class="subtitle">
+                        Serverless Analytics powered by AWS
+                    </p>
+                </div>
+
+                <button class="primary-button" type="button">
+                    Ejecutar análisis
+                </button>
+            </header>
+
+            <section class="kpi-grid">
+                <article class="kpi-card">
+                    <span class="kpi-label">Active Opportunities</span>
+                    <strong>{{ oportunidades|length }}</strong>
+                    <small>▲ +18% · Últimas 24 horas</small>
+                </article>
+
+                <article class="kpi-card">
+                    <span class="kpi-label">Score máximo</span>
+                    <strong>{{ oportunidades[0].score }}</strong>
+                    <small>Mayor oportunidad detectada</small>
+                </article>
+
+                <article class="kpi-card">
+                    <span class="kpi-label">Fuentes analizadas</span>
+                    <strong>3</strong>
+                    <small>Amazon, Keepa y Reddit</small>
+                </article>
+
+                <article class="kpi-card">
+                    <span class="kpi-label">Estado del pipeline</span>
+                    <strong class="status-text">Operativo</strong>
+                    <small>Procesamiento orientado a eventos</small>
+                </article>
+            </section>
+
+            <section class="content-grid">
+
+                <div class="panel opportunities-panel" id="oportunidades">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Ranking</p>
+                            <h3>Oportunidades detectadas</h3>
+                        </div>
+
+                        <span class="panel-badge">
+                            Ordenadas por score
+                        </span>
+                    </div>
+
+                    <div class="opportunity-list">
+                        {% for oportunidad in oportunidades %}
+                        <article class="opportunity-card">
+
+                            <div class="score-box">
+                                <span>Score</span>
+                                <strong>{{ oportunidad.score }}</strong>
+
+                                <progress
+                                    class="score-progress"
+                                    value="{{ oportunidad.score }}"
+                                    max="100"
+                                    aria-label="Opportunity Score {{ oportunidad.score }} de 100">
+                                    {{ oportunidad.score }}%
+                                </progress>
+                            </div>
+
+                            <div class="opportunity-info">
+                                <div class="opportunity-title-row">
+                                    <div>
+                                        <span class="category">
+                                            {{ oportunidad.categoria }}
+                                        </span>
+
+                                        <h4>{{ oportunidad.producto }}</h4>
+                                    </div>
+
+                                    <span class="state-badge">
+                                        {{ oportunidad.estado }}
+                                    </span>
+                                </div>
+
+                                <div class="metrics-row">
+                                    <span>
+                                        <small>ASIN</small>
+                                        {{ oportunidad.asin }}
+                                    </span>
+
+                                    <span>
+                                        <small>Precio</small>
+                                        USD {{ "%.2f"|format(oportunidad.precio) }}
+                                    </span>
+
+                                    <span>
+                                        <small>Rating</small>
+                                        {{ oportunidad.rating }}
+                                    </span>
+
+                                    <span>
+                                        <small>Competencia</small>
+                                        {{ oportunidad.competencia }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a
+                                class="detail-button"
+                                href="{{ url_for(
+                                    'detalle_oportunidad',
+                                    oportunidad_id=oportunidad.id
+                                ) }}"
+                            >
+                                Ver detalle
+                            </a>
+
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!--  PANEL PIPELINE AWS
+                 Este panel resume visualmente el flujo completo del sistema
+                 serverless. Su objetivo es mostrar al usuario cómo una
+                 oportunidad de mercado es detectada, procesada y publicada.
+                 No ejecuta servicios AWS reales; representa el diseño
+                 arquitectónico definido para el proyecto.-->
+                <aside class="panel pipeline-panel" id="pipeline">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Arquitectura</p>
+                            <h3>Pipeline AWS</h3>
+                        </div>
+                    </div>
+
+                    <div class="pipeline-list">
+                        <div class="pipeline-step">
+                            
+                            <span>01</span>
+
+                            <img
+                                class="aws-icon"
+                                src="{{ url_for('static', filename='icons/Arch_Amazon-EventBridge_64.png') }}"
+                                alt="Amazon EventBridge">
+
+                            
+                            
+                            <div>
+                                <strong>Ingesta</strong>
+                                <small>EventBridge · SQS · Lambda/Fargate</small>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step">
+                            
+                            <span>02</span>
+                            
+                            <img
+                                class="aws-icon"
+                                src="{{ url_for('static', filename='icons/Arch_Amazon-Simple-Storage-Service_64.png') }}"
+                                alt="Amazon EventBridge">
+                            
+                            
+                            <div>
+                                <strong>Data Lake</strong>
+                                <small>Amazon S3 Raw Zone</small>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step">
+                            
+                            <span>03</span>
+
+                            <img
+                                class="aws-icon"
+                                src="{{ url_for('static', filename='icons/Arch_AWS-Step-Functions_64.png') }}"
+                                alt="Amazon EventBridge">
+                            
+                            
+                            <div>
+                                <strong>Orquestación</strong>
+                                <small>AWS Step Functions</small>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step pipeline-step-analysis">
+                            
+                            <span>04</span>
+                            <div class="analysis-item">
+                                <img
+                                    class="aws-icon"
+                                    src="{{ url_for('static', filename='icons/Arch_AWS-Glue_64.png') }}" class="aws-icon"
+                                    alt="Amazon EventBridge">
+                            
+                            
+                                <img
+                                    class="aws-icon"
+                                    src="{{ url_for('static', filename='icons/Arch_Amazon-Athena_64.png') }}" class="aws-icon"
+                                    alt="Amazon EventBridge">
+                            
+                            
+                                <img
+                                class="aws-icon"
+                                src="{{ url_for('static', filename='icons/Arch_Amazon-Bedrock_64.png') }}" class="aws-icon"
+                                alt="Amazon EventBridge">
+                            </div>                           
+                            <div>
+                                <strong>Análisis</strong>
+                                <small>Glue · Athena · Bedrock</small>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step">
+                            <span>05</span>
+                            
+                             <img
+                                class="aws-icon"
+                                src="{{ url_for('static', filename='icons/Arch_AWS-Lambda_64.png') }}"
+                                alt="Amazon EventBridge">
+                            
+
+                            <div>
+                                <strong>Scoring</strong>
+                                <small>AWS Lambda</small>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step">
+                            <span>06</span>
+                            
+                            <div class="analysis-item">
+                                <img
+                                    class="aws-icon"
+                                    src="{{ url_for('static', filename='icons/Arch_Amazon-DynamoDB_64.png') }}" class="aws-icon"
+                                    alt="Amazon EventBridge">
+                            
+                            
+                                <img
+                                    class="aws-icon"
+                                    src="{{ url_for('static', filename='icons/Arch_Amazon-API-Gateway_64.png') }}" class="aws-icon"
+                                    alt="Amazon EventBridge">
+                            
+                            
+                                <img
+                                class="aws-icon"
+                                src="{{ url_for('static', filename='icons/Arch_Amazon-Simple-Notification-Service_64.png') }}" class="aws-icon"
+                                alt="Amazon EventBridge">
+                            </div>                      
+                            
+                            <div>
+                                <strong>Consumo</strong>
+                                <small>DynamoDB · API Gateway · SNS</small>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+            </section>
+        </main>
+    </div>
+</body>
+</html>
