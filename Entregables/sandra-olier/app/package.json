@@ -1,0 +1,14 @@
+{
+  "name": "mesafacil",
+  "version": "1.0.0",
+  "description": "Aplicación de reservas para el TP final de Arquitectura en la Nube",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.4.1"
+  }
+}
