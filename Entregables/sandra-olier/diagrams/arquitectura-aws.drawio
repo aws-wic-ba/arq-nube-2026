@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net" modified="2026-08-01T00:00:00.000Z" agent="Mozilla/5.0" version="24.7.17">
+  <diagram id="aws-arch" name="Arquitectura AWS">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Usuario" style="shape=mxgraph.aws4.user;html=1;fillColor=#232F3E;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="60" y="330" width="90" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Route 53" style="shape=mxgraph.aws4.route53;html=1;fillColor=#D9F0FF;strokeColor=#0F6CBD;strokeWidth=2;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="220" y="330" width="110" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="CloudFront" style="shape=mxgraph.aws4.cloudfront;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;strokeWidth=2;fontColor=#1B5E20;" vertex="1" parent="1">
+          <mxGeometry x="390" y="330" width="110" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Application&#xa;Load Balancer" style="shape=mxgraph.aws4.elasticloadbalancing;html=1;fillColor=#FFF3E0;strokeColor=#EF6C00;strokeWidth=2;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="560" y="330" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="ECS Fargate" style="shape=mxgraph.aws4.ecs;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;strokeWidth=2;fontColor=#880E4F;" vertex="1" parent="1">
+          <mxGeometry x="740" y="330" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="RDS MySQL" style="shape=mxgraph.aws4.rds;html=1;fillColor=#E1F5FE;strokeColor=#0277BD;strokeWidth=2;fontColor=#01579B;" vertex="1" parent="1">
+          <mxGeometry x="940" y="220" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Secrets Manager" style="shape=mxgraph.aws4.secretsmanager;html=1;fillColor=#F3E5F5;strokeColor=#6A1B9A;strokeWidth=2;fontColor=#4A148C;" vertex="1" parent="1">
+          <mxGeometry x="940" y="360" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="CloudWatch" style="shape=mxgraph.aws4.cloudwatch;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;strokeWidth=2;fontColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="940" y="500" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="ECR" style="shape=mxgraph.aws4.ecr;html=1;fillColor=#E0F2F1;strokeColor=#00695C;strokeWidth=2;fontColor=#004D40;" vertex="1" parent="1">
+          <mxGeometry x="740" y="160" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="S3" style="shape=mxgraph.aws4.s3;html=1;fillColor=#FFF8E1;strokeColor=#FF8F00;strokeWidth=2;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="220" width="120" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="2" target="3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="3" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="4" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="5" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="6" target="7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="6" target="8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="6" target="9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="10" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="7" target="11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#232F3E;strokeWidth=2;" edge="1" parent="1" source="6" target="11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

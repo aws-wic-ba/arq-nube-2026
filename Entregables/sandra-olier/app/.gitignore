@@ -1,0 +1,18 @@
+# Ignorar dependencias instaladas localmente y archivos sensibles
+node_modules/
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+
+# Ignorar datos locales de MySQL y artefactos temporales
+mysql_temp/
+mysql_temp2/
+*.err
+*.log
+
+# Ignorar configuraciones locales y certificados
+.DS_Store
+*.pem
+*.crt
+*.key

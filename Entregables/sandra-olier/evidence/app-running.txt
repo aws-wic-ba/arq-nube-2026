@@ -1,0 +1,3 @@
+App funcionando correctamente.
+URL: http://127.0.0.1:3000/
+Respuesta: 🚀 MesaFácil: App de reservas de mesas funcionando
