@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    container_name: identity-audit-web
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/healthz')"]
+      interval: 15s
+      timeout: 3s
+      retries: 3

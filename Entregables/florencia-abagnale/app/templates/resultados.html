@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultados — Auditoría de Identidades</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Resultado de la corrida</p>
+    <h1>Reporte de auditoría</h1>
+    <p class="subtitle">
+      {{ report.summary.total_evaluated }} identidades evaluadas &middot;
+      generado {{ report.timestamp_utc }}
+    </p>
+
+    <div class="summary-grid">
+      <div class="stat clean">
+        <div class="n">{{ report.summary.ready_for_aws_migration }}</div>
+        <div class="l">Listos para migrar a AWS</div>
+      </div>
+      <div class="stat flag">
+        <div class="n">{{ report.summary.flagged_for_manual_review }}</div>
+        <div class="l">Escalados a revisión manual</div>
+      </div>
+      <div class="stat">
+        <div class="n">{{ report.jira_ticket or "—" }}</div>
+        <div class="l">Ticket generado</div>
+      </div>
+    </div>
+
+    {% if report.jira_ticket %}
+      <p class="ticket-note">
+        Se simuló la creación del ticket {{ report.jira_ticket }} en Jira para
+        revisión de los roles marcados abajo (demo local, sin llamada real a la API).
+      </p>
+    {% endif %}
+
+    <div class="panel">
+      <label>Roles evaluados</label>
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in clean %}
+          <tr class="row-clean">
+            <td>{{ item.user }}</td>
+            <td>{{ item.role }}</td>
+            <td><span class="pill clean">Listo</span></td>
+            <td class="reasons">Cumple criterios de mínimo privilegio</td>
+          </tr>
+          {% endfor %}
+          {% for item in deprecated %}
+          <tr class="row-flag">
+            <td>{{ item.user }}</td>
+            <td>{{ item.role }}</td>
+            <td><span class="pill flag">Revisión</span></td>
+            <td class="reasons">
+              <ul>
+                {% for reason in item.deprecation_reasons %}
+                <li>{{ reason }}</li>
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <label>Controles de cumplimiento aplicados</label>
+      <div class="controls">
+        {% for control in report.compliance_context.ISO_27001_2022 %}
+          <span class="tag">ISO 27001 — {{ control }}</span>
+        {% endfor %}
+        {% for control in report.compliance_context.PCI_DSS_v4 %}
+          <span class="tag">PCI-DSS — {{ control }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back">&larr; Procesar otro dataset</a>
+  </div>
+</body>
+</html>

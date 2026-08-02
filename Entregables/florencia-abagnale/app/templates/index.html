@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motor de Auditoría de Identidades</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Azure AD &rarr; AWS</p>
+    <h1>Motor de migración y auditoría de identidades</h1>
+    <p class="subtitle">
+      Pegá el export de principals de Azure AD / Entra ID. El motor clasifica
+      cada rol por mínimo privilegio y recertificación de accesos, y separa
+      lo que está listo para migrar de lo que necesita revisión manual.
+    </p>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ url_for('procesar') }}" method="post">
+      <div class="panel">
+        <label for="azure_json">JSON de entrada (dataset de ejemplo precargado)</label>
+        <textarea id="azure_json" name="azure_json" spellcheck="false">{{ sample_json }}</textarea>
+        <button type="submit" class="btn">Procesar identidades</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
