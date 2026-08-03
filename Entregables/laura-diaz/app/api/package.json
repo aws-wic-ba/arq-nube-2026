@@ -1,0 +1,22 @@
+{
+  "name": "relocapet-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.js",
+    "seed": "tsx prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.9.1",
+    "@prisma/client": "7.9.1",
+    "cors": "2.8.6",
+    "dotenv": "17.4.2",
+    "express": "^4.19.2",
+    "pg": "^8.13.0",
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "prisma": "7.9.1"
+  }
+}
