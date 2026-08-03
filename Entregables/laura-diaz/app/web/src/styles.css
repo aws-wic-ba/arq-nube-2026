@@ -1,0 +1,144 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f7f4ef;
+  color: #262220;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #2d5f4c;
+  color: white;
+}
+
+.navbar .brand {
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.navbar nav a {
+  color: white;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.navbar nav a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: #5a5450;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.field {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+select,
+input,
+textarea {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #d8d2ca;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+button {
+  background: #2d5f4c;
+  color: white;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+button:hover:not(:disabled) {
+  background: #234b3c;
+}
+
+.error {
+  color: #a3382f;
+  font-weight: 600;
+}
+
+.empty {
+  color: #8a847d;
+}
+
+.plazo {
+  color: #5a5450;
+  font-style: italic;
+}
+
+.nota {
+  margin-top: 0.4rem;
+  color: #a3382f;
+  font-size: 0.9rem;
+}
+
+.tip header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  align-items: baseline;
+}
+
+.tip .ruta {
+  color: #5a5450;
+}
+
+.tip .dificultad {
+  margin-left: auto;
+  font-weight: 600;
+}

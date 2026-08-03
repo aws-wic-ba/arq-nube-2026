@@ -1,0 +1,85 @@
+generator client {
+  provider               = "prisma-client"
+  output                 = "../generated/prisma"
+  runtime                = "nodejs"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoRequisito {
+  SALIDA
+  ENTRADA
+}
+
+model Pais {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+  codigo String @unique
+
+  requisitos        Requisito[]
+  tipsOrigen        Tip[]           @relation("TipOrigen")
+  tipsDestino       Tip[]           @relation("TipDestino")
+  rutasComoOrigen   AerolineaRuta[] @relation("RutaOrigen")
+  rutasComoDestino  AerolineaRuta[] @relation("RutaDestino")
+}
+
+model Especie {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+
+  requisitos Requisito[]
+  tips       Tip[]
+}
+
+model Requisito {
+  id             Int           @id @default(autoincrement())
+  pais           Pais          @relation(fields: [paisId], references: [id])
+  paisId         Int
+  especie        Especie       @relation(fields: [especieId], references: [id])
+  especieId      Int
+  tipo           TipoRequisito
+  descripcion    String
+  plazoDiasAntes Int?
+  orden          Int           @default(0)
+}
+
+model Aerolinea {
+  id              Int             @id @default(autoincrement())
+  nombre          String          @unique
+  permiteCabina   Boolean         @default(false)
+  permiteBodega   Boolean         @default(false)
+  restriccionRaza String?
+  notas           String?
+  rutas           AerolineaRuta[]
+}
+
+model AerolineaRuta {
+  id            Int       @id @default(autoincrement())
+  aerolinea     Aerolinea @relation(fields: [aerolineaId], references: [id])
+  aerolineaId   Int
+  paisOrigen    Pais      @relation("RutaOrigen", fields: [paisOrigenId], references: [id])
+  paisOrigenId  Int
+  paisDestino   Pais      @relation("RutaDestino", fields: [paisDestinoId], references: [id])
+  paisDestinoId Int
+
+  @@unique([aerolineaId, paisOrigenId, paisDestinoId])
+}
+
+model Tip {
+  id                     Int      @id @default(autoincrement())
+  paisOrigen             Pais     @relation("TipOrigen", fields: [paisOrigenId], references: [id])
+  paisOrigenId           Int
+  paisDestino            Pais     @relation("TipDestino", fields: [paisDestinoId], references: [id])
+  paisDestinoId          Int
+  especie                Especie  @relation(fields: [especieId], references: [id])
+  especieId              Int
+  autor                  String
+  texto                  String
+  calificacionDificultad Int
+  fecha                  DateTime @default(now())
+}
