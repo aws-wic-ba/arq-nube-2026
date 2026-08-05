@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Beca Universitaria - Ayuntamiento de Hunucmá</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+    <div class="topbar">Gobierno Municipal de Hunucmá, Yucatan, Mexico 2024-2027</div>
+
+    <header class="site-header">
+        <div class="brand">
+            <img src="/public/logo.jpg" alt="Logo Direccion de Juventud - Hunucmá" class="brand-logo">
+            <div>
+                <strong>H. Ayuntamiento de Hunucmá</strong>
+                <div class="brand-sub">Direccion de Juventud - Hunucmá</div>
+            </div>
+        </div>
+        <nav>
+            <a href="/#convocatoria">Convocatoria</a>
+            <a href="/#requisitos">Requisitos</a>
+            <a href="/panel/datos">Solicitar beca</a>
+            <% if (usuario) { %>
+                <span>Hola, <%= usuario.email %></span>
+                <form action="/logout" method="POST" style="display:inline">
+                    <button type="submit" style="margin-top:0;padding:6px 12px;">Cerrar sesion</button>
+                </form>
+            <% } else { %>
+                <a href="/login">Iniciar sesion</a>
+            <% } %>
+            <a href="/trabajador">Acceso trabajadores</a>
+        </nav>
+    </header>
+
+    <section class="hero" id="convocatoria">
+        <div class="hero-inner">
+            <div class="hero-text">
+                <span class="hero-tag">Convocatoria abierta</span>
+                <h1>Beca Universitaria Municipal 2026</h1>
+                <p>
+                    El Ayuntamiento de Hunucmá apoya a estudiantes universitarios del municipio
+                    con una beca economica para continuar sus estudios superiores. Llena tu
+                    solicitud en linea y sube tus documentos para participar.
+                </p>
+                <a href="/panel/datos" class="btn-hero">Iniciar solicitud</a>
+            </div>
+            <div class="hero-image">
+                <img src="/public/cgica.jpg" alt="Estudiante universitaria con su laptop en la biblioteca">
+            </div>
+        </div>
+    </section>
+
+    <main class="content">
+
+        <section class="card" id="requisitos">
+            <h2>Documentos que vas a necesitar</h2>
+            <p class="muted">Tenlos listos antes de continuar; los subirás después de registrar tus datos.</p>
+            <ul class="docs-grid">
+                <% REQUIRED_DOCS.forEach(function(doc) { %>
+                <li class="doc-card">
+                    <span class="doc-icon-wrap"><%- DOC_ICONS[doc.tipo] %></span>
+                    <span>
+                        <span class="doc-label"><%= doc.label %></span>
+                        <span class="doc-hint"><%= doc.hint %></span>
+                    </span>
+                </li>
+                <% }); %>
+            </ul>
+            <a href="/public/convocatoria.pdf" target="_blank" class="btn-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                Ver convocatoria completa (PDF)
+            </a>
+        </section>
+
+        <section class="card" id="solicitud">
+            <h2>Solicitud de Beca Municipal</h2>
+            <% if (usuario) { %>
+                <p class="muted">Ya tenes sesion iniciada. Continua con tu solicitud.</p>
+                <a href="/panel/datos" class="btn-hero">Ir a mi solicitud</a>
+            <% } else { %>
+                <p class="muted">Crea una cuenta con tu correo y contraseña. Ya adentro completas tus datos personales y escolares en una pestaña, y subis tus documentos en otra.</p>
+                <a href="/registro" class="btn-hero">Crear cuenta y solicitar</a>
+                <p class="muted">¿Ya tenes cuenta? <a href="/login">Iniciar sesion</a></p>
+            <% } %>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>H. Ayuntamiento de Hunucmá, Yucatan, Mexico &mdash; Direccion de Juventud - Hunucmá</p>
+        <p><a href="/trabajador">Acceso trabajadores del ayuntamiento</a></p>
+    </footer>
+
+</body>
+</html>

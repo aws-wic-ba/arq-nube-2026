@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Trabajador - Becas Hunucmá</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <main class="content-plain">
+    <section class="card">
+    <h1>Solicitudes de Beca</h1>
+
+    <p>
+        Filtrar:
+        <a href="/trabajador">Todas</a> |
+        <a href="/trabajador?estado=completa">Completas (listas para revisar)</a> |
+        <a href="/trabajador?estado=incompleta">Incompletas</a> |
+        <a href="/trabajador?estado=aprobada">Aprobadas</a> |
+        <a href="/trabajador?estado=rechazada">Rechazadas</a>
+    </p>
+
+    <table>
+        <tr>
+            <th>#</th><th>Nombre</th><th>Escuela</th><th>Promedio</th><th>Estado</th><th></th>
+        </tr>
+        <% solicitudes.forEach(function(s) { %>
+        <tr>
+            <td><%= s.id %></td>
+            <td><%= s.nombre_completo %></td>
+            <td><%= s.escuela %></td>
+            <td><%= s.promedio %></td>
+            <td><span class="badge badge-<%= s.estado %>"><%= s.estado %></span></td>
+            <td><a href="/trabajador/solicitudes/<%= s.id %>">Ver</a></td>
+        </tr>
+        <% }); %>
+    </table>
+
+    <% if (solicitudes.length === 0) { %>
+        <p>No hay solicitudes<%= estadoFiltro ? ' con estado "' + estadoFiltro + '"' : '' %>.</p>
+    <% } %>
+    </section>
+  </main>
+</body>
+</html>

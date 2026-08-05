@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesion - Becas Hunucmá</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <main class="content-plain">
+    <section class="card">
+    <h1>Iniciar sesion</h1>
+
+    <% if (error) { %>
+        <p class="check-falta"><%= error %></p>
+    <% } %>
+
+    <form action="/login" method="POST">
+        <div class="field">
+            <label>Correo electronico</label>
+            <input type="email" name="email" required>
+        </div>
+        <div class="field">
+            <label>Contraseña</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p class="muted">¿No tenes cuenta? <a href="/registro">Crear una</a></p>
+    </section>
+  </main>
+</body>
+</html>

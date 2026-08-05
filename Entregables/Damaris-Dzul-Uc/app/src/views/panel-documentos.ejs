@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis documentos - Becas Hunucmá</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <main class="content-plain">
+    <section class="card">
+        <p class="muted">
+            <a href="/">&larr; Inicio</a> &middot;
+            <form action="/logout" method="POST" style="display:inline">
+                <button type="submit" style="margin-top:0;padding:2px 10px;font-size:0.85em;">Cerrar sesion</button>
+            </form>
+        </p>
+        <span class="hero-tag">Convocatoria abierta</span>
+        <h1>Beca Universitaria Municipal 2026</h1>
+        <p class="muted">Sube los documentos que te piden para poder evaluar tu solicitud.</p>
+    </section>
+
+    <nav class="tabs">
+        <a href="/panel/datos">Datos personales</a>
+        <a href="/panel/documentos" class="tab-active">Subir documentos</a>
+    </nav>
+
+    <section class="card">
+        <h2>Documentos requeridos</h2>
+        <% if (solicitud.estado === 'incompleta' && todosSubidos) { %>
+            <p>Estado actual: <span class="badge badge-completa">completado</span></p>
+        <% } else { %>
+            <p>Estado actual: <span class="badge badge-<%= solicitud.estado %>"><%= solicitud.estado %></span></p>
+        <% } %>
+
+        <table>
+            <tr><th>Documento</th><th>Estado</th></tr>
+            <% checklist.forEach(function(doc) { %>
+            <tr>
+                <td><%= doc.label %></td>
+                <td>
+                    <% if (doc.subido) { %>
+                        <span class="check-ok">&#10003; Subido</span>
+                    <% } else { %>
+                        <span class="check-falta">&#10007; Falta</span>
+                    <% } %>
+                </td>
+            </tr>
+            <% }); %>
+        </table>
+
+        <% if (solicitud.estado === 'incompleta') { %>
+        <h2>Subir documento</h2>
+        <form action="/panel/documentos" method="POST" enctype="multipart/form-data">
+            <label>Tipo de documento</label>
+            <select name="tipo" required>
+                <% checklist.forEach(function(doc) { %>
+                    <option value="<%= doc.tipo %>"><%= doc.label %></option>
+                <% }); %>
+            </select>
+
+            <label>Archivo (PDF o imagen)</label>
+            <input type="file" name="archivo" accept=".pdf,.jpg,.jpeg,.png" required>
+
+            <button type="submit">Subir</button>
+        </form>
+
+        <% if (todosSubidos) { %>
+            <h2>Enviar solicitud</h2>
+            <p class="muted">Ya subiste todos los documentos requeridos. Enviala para que el Departamento la revise.</p>
+            <form action="/panel/documentos/enviar" method="POST">
+                <button type="submit">Enviar solicitud</button>
+            </form>
+        <% } else { %>
+            <p class="muted">Sube todos los documentos de la lista para poder enviar tu solicitud.</p>
+        <% } %>
+
+        <% } else if (solicitud.estado === 'completa') { %>
+            <p class="check-ok">Tu solicitud ya fue enviada y esta en revision por el Departamento de Juventudes.</p>
+        <% } else if (solicitud.estado === 'aprobada') { %>
+            <p class="check-ok">Tu solicitud fue aprobada.</p>
+        <% } else if (solicitud.estado === 'rechazada') { %>
+            <p class="check-falta">Tu solicitud fue rechazada.</p>
+        <% } %>
+    </section>
+  </main>
+</body>
+</html>

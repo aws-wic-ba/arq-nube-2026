@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi solicitud - Becas Hunucmá</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <main class="content-plain">
+    <% if (saved) { %>
+        <div class="banner-ok">&#10003; Tus datos se guardaron correctamente.</div>
+    <% } %>
+    <section class="card">
+        <p class="muted">
+            <a href="/">&larr; Inicio</a> &middot;
+            <form action="/logout" method="POST" style="display:inline">
+                <button type="submit" style="margin-top:0;padding:2px 10px;font-size:0.85em;">Cerrar sesion</button>
+            </form>
+        </p>
+        <span class="hero-tag">Convocatoria abierta</span>
+        <h1>Beca Universitaria Municipal 2026</h1>
+        <p class="muted">
+            Completa tus datos personales y escolares en esta pestaña. Cuando termines,
+            pasa a "Subir documentos" para adjuntar tu INE, acta de nacimiento,
+            comprobante de estudios y comprobante de domicilio.
+        </p>
+    </section>
+
+    <nav class="tabs">
+        <a href="/panel/datos" class="tab-active">Datos personales</a>
+        <a href="/panel/documentos">Subir documentos</a>
+    </nav>
+
+    <section class="card">
+        <h2>Mis datos</h2>
+
+        <form action="/panel/datos" method="POST">
+            <h3>Datos personales</h3>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" value="<%= solicitud.nombre %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Apellido</label>
+                    <input type="text" name="apellido" value="<%= solicitud.apellido %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Fecha de nacimiento</label>
+                    <input type="date" name="fecha_nacimiento" value="<%= solicitud.fecha_nacimiento ? solicitud.fecha_nacimiento.toISOString().slice(0,10) : '' %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Sexo</label>
+                    <select name="sexo" required>
+                        <option value="">Selecciona</option>
+                        <option value="femenino" <%= solicitud.sexo === 'femenino' ? 'selected' : '' %>>Femenino</option>
+                        <option value="masculino" <%= solicitud.sexo === 'masculino' ? 'selected' : '' %>>Masculino</option>
+                        <option value="otro" <%= solicitud.sexo === 'otro' ? 'selected' : '' %>>Otro</option>
+                        <option value="prefiero_no_decir" <%= solicitud.sexo === 'prefiero_no_decir' ? 'selected' : '' %>>Prefiero no decir</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Estado civil</label>
+                    <select name="estado_civil" required>
+                        <option value="">Selecciona</option>
+                        <option value="soltero" <%= solicitud.estado_civil === 'soltero' ? 'selected' : '' %>>Soltero/a</option>
+                        <option value="casado" <%= solicitud.estado_civil === 'casado' ? 'selected' : '' %>>Casado/a</option>
+                        <option value="union_libre" <%= solicitud.estado_civil === 'union_libre' ? 'selected' : '' %>>Union libre</option>
+                        <option value="otro" <%= solicitud.estado_civil === 'otro' ? 'selected' : '' %>>Otro</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>CURP</label>
+                    <input type="text" name="curp" maxlength="18" value="<%= solicitud.curp %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Telefono de contacto</label>
+                    <input type="tel" name="telefono" value="<%= solicitud.telefono %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Domicilio completo</label>
+                    <input type="text" name="domicilio" placeholder="Calle, numero, colonia, CP" value="<%= solicitud.domicilio %>" required>
+                </div>
+            </div>
+
+            <h3>Datos academicos</h3>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Escuela / Universidad</label>
+                    <input type="text" name="escuela" value="<%= solicitud.escuela %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Carrera</label>
+                    <input type="text" name="carrera" value="<%= solicitud.carrera %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Semestre / grado actual</label>
+                    <input type="text" name="semestre" placeholder="Ej. 5to semestre" value="<%= solicitud.semestre %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Matricula</label>
+                    <input type="text" name="matricula" value="<%= solicitud.matricula %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Modalidad</label>
+                    <select name="modalidad" required>
+                        <option value="">Selecciona</option>
+                        <option value="presencial" <%= solicitud.modalidad === 'presencial' ? 'selected' : '' %>>Presencial</option>
+                        <option value="en_linea" <%= solicitud.modalidad === 'en_linea' ? 'selected' : '' %>>En linea</option>
+                        <option value="mixta" <%= solicitud.modalidad === 'mixta' ? 'selected' : '' %>>Mixta</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Promedio</label>
+                    <input type="number" step="0.01" min="0" max="10" name="promedio" value="<%= solicitud.promedio || '' %>" required>
+                </div>
+
+                <div class="field">
+                    <label><input type="checkbox" name="ya_graduo" <%= solicitud.ya_graduo ? 'checked' : '' %>> Ya me gradue</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="acepta_actividades" <%= solicitud.acepta_actividades ? 'checked' : '' %> required>
+                    Si resulto seleccionado/a, me comprometo a participar activamente en las actividades
+                    que organice la Direccion de Juventud - Hunucmá para becarios/as.
+                </label>
+            </div>
+
+            <button type="submit">Guardar datos</button>
+        </form>
+    </section>
+  </main>
+</body>
+</html>

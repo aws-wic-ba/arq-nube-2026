@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitud #<%= solicitud.id %> - Detalle</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <main class="content-plain">
+    <section class="card">
+    <p><a href="/trabajador">&larr; Volver al listado</a></p>
+    <h1><%= solicitud.nombre_completo %></h1>
+    <p>Estado: <span class="badge badge-<%= solicitud.estado %>"><%= solicitud.estado %></span></p>
+
+    <h2>Datos personales</h2>
+    <table>
+        <tr><th>CURP</th><td><%= solicitud.curp %></td></tr>
+        <tr><th>Email</th><td><%= solicitud.email %></td></tr>
+        <tr><th>Telefono</th><td><%= solicitud.telefono %></td></tr>
+        <tr><th>Fecha de nacimiento</th><td><%= solicitud.fecha_nacimiento ? solicitud.fecha_nacimiento.toISOString().slice(0,10) : '' %></td></tr>
+        <tr><th>Sexo</th><td><%= solicitud.sexo %></td></tr>
+        <tr><th>Estado civil</th><td><%= solicitud.estado_civil %></td></tr>
+        <tr><th>Domicilio</th><td><%= solicitud.domicilio %></td></tr>
+    </table>
+
+    <h2>Datos academicos</h2>
+    <table>
+        <tr><th>Escuela</th><td><%= solicitud.escuela %></td></tr>
+        <tr><th>Carrera</th><td><%= solicitud.carrera %></td></tr>
+        <tr><th>Semestre</th><td><%= solicitud.semestre %></td></tr>
+        <tr><th>Matricula</th><td><%= solicitud.matricula %></td></tr>
+        <tr><th>Modalidad</th><td><%= solicitud.modalidad %></td></tr>
+        <tr><th>Promedio</th><td><%= solicitud.promedio %></td></tr>
+        <tr><th>Ya se graduo</th><td><%= solicitud.ya_graduo ? 'Si' : 'No' %></td></tr>
+        <tr><th>Se compromete a actividades de la Direccion de Juventud</th><td><%= solicitud.acepta_actividades ? 'Si' : 'No' %></td></tr>
+    </table>
+
+    <h2>Documentos</h2>
+    <table>
+        <tr><th>Tipo</th><th>Archivo</th></tr>
+        <% documentos.forEach(function(d) { %>
+        <tr>
+            <td><%= d.tipo %></td>
+            <td><a href="/uploads/<%= solicitud.id %>/<%= d.filename %>" target="_blank">Ver archivo</a></td>
+        </tr>
+        <% }); %>
+    </table>
+
+    <% if (solicitud.estado === 'completa') { %>
+    <h2>Resolucion</h2>
+    <form action="/trabajador/solicitudes/<%= solicitud.id %>/estado" method="POST">
+        <button type="submit" name="estado" value="aprobada">Aprobar</button>
+        <button type="submit" name="estado" value="rechazada">Rechazar</button>
+    </form>
+    <% } else if (solicitud.estado === 'incompleta') { %>
+        <p><em>Solicitud incompleta, faltan documentos. No disponible para resolucion todavia.</em></p>
+    <% } %>
+    </section>
+  </main>
+</body>
+</html>

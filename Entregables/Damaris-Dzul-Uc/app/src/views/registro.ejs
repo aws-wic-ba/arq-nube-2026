@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear cuenta - Becas Hunucmá</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+  <main class="content-plain">
+    <section class="card">
+    <h1>Crear cuenta</h1>
+    <p class="muted">Solo necesitas correo y contraseña. Tus datos personales y escolares los completas ya adentro.</p>
+
+    <% if (error) { %>
+        <p class="check-falta"><%= error %></p>
+    <% } %>
+
+    <form action="/registro" method="POST">
+        <div class="field">
+            <label>Correo electronico</label>
+            <input type="email" name="email" required>
+        </div>
+        <div class="field">
+            <label>Contraseña</label>
+            <input type="password" name="password" minlength="6" required>
+        </div>
+        <button type="submit">Crear cuenta</button>
+    </form>
+
+    <p class="muted">¿Ya tenes cuenta? <a href="/login">Iniciar sesion</a></p>
+    </section>
+  </main>
+</body>
+</html>
