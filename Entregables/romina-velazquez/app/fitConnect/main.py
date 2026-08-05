@@ -83,12 +83,14 @@ def dashboard_page(request: Request, user_id: Optional[str] = Cookie(None), user
     
     exercises = session.exec(select(Exercise).where(Exercise.user_id == int(user_id))).all()
     users = session.exec(select(User)).all()  # <--- Agregamos esto para listar la comunidad
+    routines = session.exec(select(Routine).where(Routine.user_id == int(user_id))).all()
     
     return templates.TemplateResponse("dashboard.html", {
         "request": request, 
         "username": username, 
         "exercises": exercises,
-        "users": users
+        "users": users,
+        "routines": routines
     })
 
 # 5. Guardar Ejercicio
@@ -109,3 +111,71 @@ def logout():
     resp.delete_cookie(key="user_id")
     resp.delete_cookie(key="username")
     return resp
+
+# Nuevos Modelos en la Base de Datos
+class Routine(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int
+    name: str          # Ej: "Rutina Volumen Hipertrofia"
+    days_count: int    # Cantidad de días (ej. 3 o 5)
+    start_date: str    # <--- Nueva fecha de inicio
+    end_date: str      # <--- Nueva fecha de fin
+
+class RoutineExercise(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    routine_id: int
+    day_number: int    # Día al que pertenece (Ej: Día 1, Día 2)
+    name: str          # Ej: Press de Banca
+    sets: int
+    reps: int
+    weight: float
+
+# Ruta para crear la rutina base
+@app.post("/routines", response_class=RedirectResponse)
+def create_routine(
+    name: str = Form(...), 
+    days_count: int = Form(...), 
+    start_date: str = Form(...),  # <--- Recibir fecha de inicio
+    end_date: str = Form(...),    # <--- Recibir fecha de fin
+    user_id: Optional[str] = Cookie(None), 
+    session: Session = Depends(get_session)
+):
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    new_routine = Routine(
+        user_id=int(user_id), 
+        name=name, 
+        days_count=days_count,
+        start_date=start_date,
+        end_date=end_date
+    )
+    session.add(new_routine)
+    session.commit()
+    session.refresh(new_routine)
+    
+    return RedirectResponse(url=f"/routines/{new_routine.id}/add-exercises", status_code=303)
+
+# Ruta para ver el panel de detalles y agregar ejercicios por día
+@app.get("/routines/{routine_id}/add-exercises", response_class=HTMLResponse)
+def routine_builder_page(request: Request, routine_id: int, user_id: Optional[str] = Cookie(None), username: Optional[str] = Cookie(None), session: Session = Depends(get_session)):
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    routine = session.get(Routine, routine_id)
+    exercises = session.exec(select(RoutineExercise).where(RoutineExercise.routine_id == routine_id)).all()
+    
+    return templates.TemplateResponse("routine_builder.html", {
+        "request": request,
+        "username": username,
+        "routine": routine,
+        "exercises": exercises
+    })
+
+# Ruta para guardar un ejercicio dentro de un día específico de la rutina
+@app.post("/routines/{routine_id}/exercises", response_class=RedirectResponse)
+def add_exercise_to_routine(routine_id: int, day_number: int = Form(...), name: str = Form(...), sets: int = Form(...), reps: int = Form(...), weight: float = Form(...), session: Session = Depends(get_session)):
+    new_item = RoutineExercise(routine_id=routine_id, day_number=day_number, name=name, sets=sets, reps=reps, weight=weight)
+    session.add(new_item)
+    session.commit()
+    return RedirectResponse(url=f"/routines/{routine_id}/add-exercises", status_code=303)
