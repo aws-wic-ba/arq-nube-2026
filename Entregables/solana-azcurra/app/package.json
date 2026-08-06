@@ -1,0 +1,13 @@
+{
+  "name": "ecocanje",
+  "version": "1.0.0",
+  "description": "App de recolección de materiales reciclables con sistema de puntos",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
+  }
+}
