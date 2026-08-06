@@ -1,0 +1,258 @@
+/* ==========
+   OdonoGest
+   Estilos Globales
+========== */
+
+body{
+    background:#FAF7FD;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:#4B5563;
+}
+
+/* NAVBAR */
+
+.navbar{
+    background:white !important;
+}
+
+/* TARJETAS */
+
+.card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+/* BOTONES */
+
+.btn-primary{
+
+    background:#9D7EC2;
+    border:none;
+    border-radius:50px;
+
+}
+
+.btn-primary:hover{
+
+    background:#8561B5;
+
+}
+
+.btn-outline-primary{
+
+    border-radius:50px;
+
+}
+
+/* HERO */
+
+.hero{
+
+    background:#F7F2FC;
+
+    border-radius:25px;
+
+}
+
+/* TITULOS */
+
+h1,h2,h3,h4,h5{
+
+    color:#3D3D3D;
+
+    font-weight:700;
+
+}
+
+/* ICONOS */
+
+.icon-card{
+
+    font-size:3rem;
+
+}
+
+/* ACCESOS RAPIDOS */
+
+.quick-card{
+
+    transition:.25s;
+
+    cursor:pointer;
+
+}
+
+.quick-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+/* ESTADO SISTEMA */
+
+.status-ok{
+
+    color:#58B368;
+
+    font-weight:bold;
+
+}
+
+/* BADGES */
+
+.badge{
+
+    background:#F3E9FC;
+
+    color:#8B5FBF;
+
+    font-weight:500;
+
+}
+
+/* FOOTER */
+
+footer{
+
+    background:white;
+
+}
+.btn{
+
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+
+}
+/* POST-IT */
+
+.postit{
+
+    background:#FFF8B8;
+
+    padding:20px;
+
+    border-radius:8px;
+
+    transform:rotate(2deg);
+
+    box-shadow:8px 8px 20px rgba(0,0,0,.15);
+
+    border:1px solid #F2E38B;
+
+}
+
+.postit textarea{
+
+    background:transparent;
+
+    border:none;
+
+    resize:none;
+
+    width:100%;
+
+    min-height:180px;
+
+    outline:none;
+
+}
+
+.postit button{
+
+    margin-top:15px;
+
+}
+/* ==========================
+   AGENDA
+========================== */
+
+.appointment-card{
+
+    background:white;
+
+    border-left:6px solid #CDB4DB;
+
+    border-radius:15px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+
+    transition:.25s;
+
+}
+
+.appointment-card:hover{
+
+    transform:translateY(-3px);
+
+}
+
+.time{
+
+    color:#9D7EC2;
+
+    font-size:1.2rem;
+
+    font-weight:bold;
+
+}
+
+.patient{
+
+    font-size:1.1rem;
+
+    font-weight:600;
+
+}
+
+.detail{
+
+    color:#777;
+
+    font-size:.9rem;
+
+}
+/* ==========================
+   POST IT
+========================== */
+
+.postit{
+
+    background:#FFF8B8;
+
+    border-radius:8px;
+
+    padding:20px;
+
+    transform:rotate(2deg);
+
+    box-shadow:8px 8px 20px rgba(0,0,0,.15);
+
+    border:1px solid #F0DE6E;
+
+}
+
+.postit textarea{
+
+    width:100%;
+
+    min-height:180px;
+
+    border:none;
+
+    resize:none;
+
+    background:transparent;
+
+    outline:none;
+
+}
+
+.postit-title{
+
+    font-weight:bold;
+
+    color:#555;
+
+}

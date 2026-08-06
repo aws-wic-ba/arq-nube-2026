@@ -1,0 +1,12 @@
+services:
+
+  odontogest:
+
+    build: .
+
+    container_name: odontogest
+
+    ports:
+      - "5000:5000"
+
+    restart: unless-stopped
