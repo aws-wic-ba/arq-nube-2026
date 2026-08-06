@@ -35,15 +35,15 @@ AWS IAM
 
 | Servicio | Función | Justificación |
 |----------|----------|---------------|
-| **Amazon EC2** | Hospedar la aplicación web | Ejecuta la aplicación Flask dentro de un contenedor Docker. Se eligió por su simplicidad, flexibilidad y bajo costo para una solución de pequeña escala. |
-| **Amazon RDS PostgreSQL (Multi-AZ)** | Base de datos | Almacena la información del consultorio. La configuración Multi-AZ mejora la disponibilidad y permite recuperación automática ante fallos. |
-| **Amazon S3** | Almacenamiento de archivos | Guarda radiografías, fotografías y documentos clínicos sin ocupar espacio en la base de datos. |
-| **AWS IAM** | Gestión de identidades | Aplica el principio de mínimo privilegio para controlar los permisos de usuarios y servicios. |
-| **Security Groups** | Seguridad de red | Restringen el acceso únicamente a los puertos necesarios y protegen la base de datos del acceso público. |
-| **AWS Secrets Manager** | Gestión de credenciales | Almacena de forma segura las contraseñas y datos sensibles utilizados por la aplicación. |
-| **Amazon CloudWatch** | Monitoreo | Centraliza métricas, registros y alertas para detectar incidentes rápidamente. |
-| **Amazon SNS** | Notificaciones | Envía alertas cuando CloudWatch detecta eventos críticos en la infraestructura. |
-| **Amazon Route 53** | DNS | Dirige las solicitudes de los usuarios hacia la aplicación publicada en Amazon EC2. |
+| **Amazon EC2** | Hospedar la aplicación web | Ejecuta la aplicación Flask dentro de un contenedor Docker. Elegi EC2 porque es de facil escalabilidad ademas de su optimizacion de costos. En esta intancia del proyecto es la herramienta que mas se adecua.|
+| **Amazon RDS PostgreSQL (Multi-AZ)** | Base de datos | Almacena la información del consultorio. Para el proyecto, entendi que el servicio mas impresindible es la base de datos, la accesibilidad y recuperacion de los mismos. PostgreSQL no solo es solido, sino que cuenta con Muli-AZ lo que permite la facil recuperacion ante desastres |
+| **Amazon S3** | Almacenamiento de archivos | Pense en este servicio, para los datos como los aduntos de las fichas clinicas, radiografias, imagenes, estudios, etc. |
+| **AWS IAM** | Gestión de identidades | Pensado para gestionar los perfiles de distntos usuarios (Owner, recepcionista, odontologos, y hasta pacientes) . |
+| **Security Groups** | Seguridad de red | Protege la base de datos de todo publico, y da acceso unicamente correspondiente segun quien acceda. |
+| **AWS Secrets Manager** | Gestión de credenciales | Seguridad en las contraseñas y datos sensibles utilizados por la aplicacion. |
+| **Amazon CloudWatch** | Monitoreo | Control de metricas, registros y alertas para detectar incidentes rapidamente, esta ultima funcion es la que creo mas imprescindible. |
+| **Amazon SNS** | Notificaciones | Notificacion de alertas cuando CloudWatch detecta eventos criticos en la infraestructura. |
+| **Amazon Route 53** | DNS | Escalable y de alta disponibilidad, donde enruta el trafico de nuestra EC2. Acompaña el crecimiento futuro sin necesidad de alterar la infraestructura.|
 
 ---
 
