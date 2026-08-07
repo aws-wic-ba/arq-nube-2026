@@ -1,0 +1,7 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+lambda.zip
+# Credenciales/entorno local del proyecto (dummy, pero no se versiona).
+.aws/
+.envrc
