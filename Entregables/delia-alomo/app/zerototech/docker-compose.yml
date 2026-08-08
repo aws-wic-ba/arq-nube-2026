@@ -1,0 +1,9 @@
+services:
+  zerototech:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zerototech-app
+    ports:
+      - "8080:80"
+    restart: unless-stopped
