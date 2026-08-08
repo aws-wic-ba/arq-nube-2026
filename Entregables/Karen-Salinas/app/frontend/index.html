@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura — Descubrí eventos cerca tuyo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12201c;
+      --ink-soft: #2a3d36;
+      --fog: #e8f0ec;
+      --mist: #f4f8f6;
+      --paper: #fbfdfc;
+      --accent: #e85d04;
+      --accent-deep: #c44d03;
+      --line: rgba(18, 32, 28, 0.12);
+      --shadow: 0 18px 40px rgba(18, 32, 28, 0.08);
+      --radius: 14px;
+      --max: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(232, 93, 4, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(42, 61, 54, 0.08), transparent 50%),
+        linear-gradient(180deg, var(--mist) 0%, var(--paper) 40%, var(--fog) 100%);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(14px);
+      background: rgba(251, 253, 252, 0.82);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      font-size: 1.65rem;
+      letter-spacing: -0.03em;
+      animation: rise 0.7s ease both;
+    }
+
+    .logo-mark {
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 50% 40% 55% 45%;
+      background: conic-gradient(from 210deg, var(--accent), #ffb703, #2a9d8f, var(--accent));
+      box-shadow: inset 0 0 0 3px rgba(251, 253, 252, 0.55);
+      animation: spin-slow 18s linear infinite;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .user-chip {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+    }
+
+    .user-chip.visible {
+      display: inline-flex;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 0.7rem 1.2rem;
+      font-weight: 600;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(18, 32, 28, 0.04);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-deep);
+    }
+
+    /* Hero */
+    .hero {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 3.5rem 1.25rem 2.5rem;
+      display: grid;
+      gap: 2rem;
+      align-items: end;
+      min-height: min(72vh, 640px);
+    }
+
+    @media (min-width: 860px) {
+      .hero {
+        grid-template-columns: 1.1fr 0.9fr;
+        padding-top: 4.5rem;
+      }
+    }
+
+    .hero-copy {
+      animation: rise 0.8s 0.1s ease both;
+    }
+
+    .brand-hero {
+      font-family: "Fraunces", serif;
+      font-size: clamp(3.4rem, 9vw, 6.4rem);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .brand-hero span {
+      color: var(--accent);
+    }
+
+    .hero-copy h1 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 500;
+      line-height: 1.2;
+      max-width: 16ch;
+      margin-bottom: 0.85rem;
+      color: var(--ink-soft);
+    }
+
+    .hero-copy p {
+      max-width: 34ch;
+      color: var(--ink-soft);
+      margin-bottom: 1.6rem;
+      font-size: 1.05rem;
+    }
+
+    .search-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.4rem;
+      box-shadow: var(--shadow);
+      max-width: 520px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      min-width: 180px;
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 0.75rem 1rem;
+      color: var(--ink);
+    }
+
+    .search-bar input::placeholder {
+      color: #7a8b84;
+    }
+
+    .hero-visual {
+      position: relative;
+      min-height: 280px;
+      border-radius: 28px;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(18, 32, 28, 0.35), rgba(232, 93, 4, 0.25)),
+        url("https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80")
+          center/cover;
+      box-shadow: var(--shadow);
+      animation: rise 0.9s 0.2s ease both;
+    }
+
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(18, 32, 28, 0.55), transparent 55%);
+    }
+
+    .hero-caption {
+      position: absolute;
+      left: 1.25rem;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 1;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* Main layout */
+    .main {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 1.25rem 4rem;
+      display: grid;
+      gap: 2rem;
+    }
+
+    @media (min-width: 900px) {
+      .main {
+        grid-template-columns: 240px 1fr;
+        align-items: start;
+      }
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .panel h2 {
+      font-family: "Fraunces", serif;
+      font-size: 1.25rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .panel-lead {
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+      margin-bottom: 1rem;
+    }
+
+    .category-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .category-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      padding: 0.7rem 0.8rem;
+      cursor: pointer;
+      color: var(--ink-soft);
+      font-weight: 550;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .category-btn:hover,
+    .category-btn.active {
+      background: rgba(232, 93, 4, 0.1);
+      color: var(--ink);
+    }
+
+    .category-btn.active {
+      font-weight: 700;
+    }
+
+    .category-count {
+      color: #7a8b84;
+      font-size: 0.85rem;
+    }
+
+    .events-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .events-header h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+    }
+
+    .events-meta {
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+
+    .events-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    @media (min-width: 700px) {
+      .events-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .event-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      animation: rise 0.6s ease both;
+    }
+
+    .event-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .event-image {
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .event-badge {
+      position: absolute;
+      left: 0.85rem;
+      top: 0.85rem;
+      background: rgba(251, 253, 252, 0.92);
+      color: var(--ink);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+    }
+
+    .event-body {
+      padding: 1.1rem 1.15rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      flex: 1;
+    }
+
+    .event-body h3 {
+      font-family: "Fraunces", serif;
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .event-meta {
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+    }
+
+    .event-desc {
+      color: #4d5f58;
+      font-size: 0.93rem;
+      margin-top: 0.2rem;
+      flex: 1;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--ink-soft);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--line);
+      background: #12201c;
+      color: #d7e4de;
+      margin-top: 2rem;
+    }
+
+    .footer-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem;
+      display: grid;
+      gap: 1.75rem;
+    }
+
+    @media (min-width: 700px) {
+      .footer-inner {
+        grid-template-columns: 1.4fr 1fr 1fr;
+      }
+    }
+
+    .footer-brand {
+      font-family: "Fraunces", serif;
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-inner p {
+      max-width: 34ch;
+      color: #a8bbb3;
+      font-size: 0.95rem;
+    }
+
+    .footer-col h4 {
+      color: #fff;
+      margin-bottom: 0.7rem;
+      font-size: 0.95rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .footer-col a {
+      color: #a8bbb3;
+      transition: color 0.2s ease;
+    }
+
+    .footer-col a:hover {
+      color: #fff;
+    }
+
+    .footer-bottom {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1rem 1.25rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #8fa39b;
+      font-size: 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    /* Modal login */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 32, 28, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(420px, 100%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 1.6rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+      animation: rise 0.35s ease both;
+    }
+
+    .modal h2 {
+      font-family: "Fraunces", serif;
+      font-size: 1.7rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .modal p {
+      color: var(--ink-soft);
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.35rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .field label {
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .field input {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+      margin-top: 0.5rem;
+    }
+
+    .login-error {
+      color: #b42318;
+      font-size: 0.88rem;
+      min-height: 1.2em;
+      margin-bottom: 0.4rem;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin-slow {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="#" aria-label="Aura inicio">
+        <span class="logo-mark" aria-hidden="true"></span>
+        Aura
+      </a>
+      <div class="nav-actions">
+        <span class="user-chip" id="user-chip"></span>
+        <button class="btn btn-ghost" id="btn-logout" type="button" hidden>Cerrar sesión</button>
+        <button class="btn btn-primary" id="btn-login" type="button">Iniciar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="brand-hero">Aura<span>.</span></p>
+      <h1>Eventos que dejan huella</h1>
+      <p>Encontrá experiencias cerca tuyo: música, arte, tecnología y más, filtradas por ubicación y categoría.</p>
+      <form class="search-bar" id="search-form" role="search">
+        <input
+          type="search"
+          id="location-search"
+          name="ubicacion"
+          placeholder="Buscar por ubicación… ej. Palermo, Córdoba"
+          aria-label="Buscar eventos por ubicación"
+        />
+        <button class="btn btn-primary" type="submit">Buscar</button>
+      </form>
+    </div>
+    <div class="hero-visual" role="img" aria-label="Público en un evento nocturno">
+      <p class="hero-caption">Esta semana en tu ciudad</p>
+    </div>
+  </section>
+
+  <main class="main">
+    <aside class="panel" aria-labelledby="categorias-titulo">
+      <h2 id="categorias-titulo">Categorías</h2>
+      <p class="panel-lead">Filtrá por el tipo de experiencia que buscás.</p>
+      <ul class="category-list" id="category-list"></ul>
+    </aside>
+
+    <section aria-labelledby="eventos-titulo">
+      <div class="events-header">
+        <div>
+          <h2 id="eventos-titulo">Eventos publicados</h2>
+          <p class="events-meta" id="events-meta">Cargando eventos…</p>
+        </div>
+      </div>
+      <div class="events-grid" id="events-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-brand">Aura</p>
+        <p>Una plataforma para descubrir y compartir eventos culturales, sociales y profesionales en toda Argentina.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explorar</h4>
+        <ul>
+          <li><a href="#eventos-titulo">Eventos</a></li>
+          <li><a href="#categorias-titulo">Categorías</a></li>
+          <li><a href="#">Ciudades</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Comunidad</h4>
+        <ul>
+          <li><a href="#">Publicar un evento</a></li>
+          <li><a href="#">Ayuda</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Aura. Todos los derechos reservados.</span>
+      <span>Hecho para descubrir lo que pasa cerca tuyo.</span>
+    </div>
+  </footer>
+
+  <div class="modal-overlay" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <div class="modal">
+      <h2 id="login-title">Iniciar sesión</h2>
+      <p>Entrá a Aura para guardar eventos y seguir organizadores.</p>
+      <form id="login-form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+        </div>
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required minlength="4" />
+        </div>
+        <p class="login-error" id="login-error" aria-live="polite"></p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" type="button" id="btn-cancel-login">Cancelar</button>
+          <button class="btn btn-primary" type="submit">Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const eventos = [
+      {
+        id: 1,
+        titulo: "Noche de Jazz en el Parque",
+        categoria: "Música",
+        ubicacion: "Palermo, Buenos Aires",
+        fecha: "Vie 14 mar · 21:00",
+        descripcion: "Cuarteto en vivo bajo las estrellas con food trucks y barra de cócteles.",
+        imagen: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 2,
+        titulo: "Feria de Diseño Independiente",
+        categoria: "Arte",
+        ubicacion: "Córdoba Capital",
+        fecha: "Sáb 15 mar · 11:00",
+        descripcion: "Más de 40 marcas locales de moda, cerámica e ilustración.",
+        imagen: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 3,
+        titulo: "Meetup Cloud & DevOps",
+        categoria: "Tecnología",
+        ubicacion: "Microcentro, Buenos Aires",
+        fecha: "Jue 20 mar · 18:30",
+        descripcion: "Charlas sobre containers, CI/CD y arquitectura en la nube.",
+        imagen: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 4,
+        titulo: "Carrera 10K Costanera",
+        categoria: "Deportes",
+        ubicacion: "Rosario, Santa Fe",
+        fecha: "Dom 22 mar · 08:00",
+        descripcion: "Circuito costero con kit de corredor y hidratación incluida.",
+        imagen: "https://images.unsplash.com/photo-1452626038306-a296fbd6f1c4?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 5,
+        titulo: "Cena a ciegas — Menú de autor",
+        categoria: "Gastronomía",
+        ubicacion: "Palermo, Buenos Aires",
+        fecha: "Vie 21 mar · 20:30",
+        descripcion: "Experiencia sensorial de 5 pasos en un espacio íntimo.",
+        imagen: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 6,
+        titulo: "Taller de Fotografía Urbana",
+        categoria: "Arte",
+        ubicacion: "La Plata, Buenos Aires",
+        fecha: "Sáb 28 mar · 15:00",
+        descripcion: "Recorrido guiado y edición básica para principiantes.",
+        imagen: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 7,
+        titulo: "Stand-up Open Mic",
+        categoria: "Entretenimiento",
+        ubicacion: "Córdoba Capital",
+        fecha: "Mié 18 mar · 22:00",
+        descripcion: "Noche de comedia con comediante invitados y open mic.",
+        imagen: "https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=900&q=80",
+      },
+      {
+        id: 8,
+        titulo: "Yoga al amanecer",
+        categoria: "Bienestar",
+        ubicacion: "Mendoza Capital",
+        fecha: "Dom 16 mar · 07:00",
+        descripcion: "Sesión al aire libre con mate compartido al finalizar.",
+        imagen: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=900&q=80",
+      },
+    ];
+
+    const categorias = ["Todas", ...new Set(eventos.map((e) => e.categoria))];
+
+    let categoriaActiva = "Todas";
+    let ubicacionFiltro = "";
+
+    const categoryList = document.getElementById("category-list");
+    const eventsGrid = document.getElementById("events-grid");
+    const eventsMeta = document.getElementById("events-meta");
+    const searchForm = document.getElementById("search-form");
+    const locationSearch = document.getElementById("location-search");
+
+    const loginModal = document.getElementById("login-modal");
+    const loginForm = document.getElementById("login-form");
+    const loginError = document.getElementById("login-error");
+    const btnLogin = document.getElementById("btn-login");
+    const btnLogout = document.getElementById("btn-logout");
+    const btnCancelLogin = document.getElementById("btn-cancel-login");
+    const userChip = document.getElementById("user-chip");
+
+    function contarPorCategoria(nombre) {
+      if (nombre === "Todas") return eventos.length;
+      return eventos.filter((e) => e.categoria === nombre).length;
+    }
+
+    function renderCategorias() {
+      categoryList.innerHTML = categorias
+        .map(
+          (cat) => `
+        <li>
+          <button
+            type="button"
+            class="category-btn ${cat === categoriaActiva ? "active" : ""}"
+            data-categoria="${cat}"
+          >
+            <span>${cat}</span>
+            <span class="category-count">${contarPorCategoria(cat)}</span>
+          </button>
+        </li>
+      `
+        )
+        .join("");
+    }
+
+    function eventosFiltrados() {
+      return eventos.filter((evento) => {
+        const okCategoria = categoriaActiva === "Todas" || evento.categoria === categoriaActiva;
+        const okUbicacion =
+          !ubicacionFiltro ||
+          evento.ubicacion.toLowerCase().includes(ubicacionFiltro.toLowerCase());
+        return okCategoria && okUbicacion;
+      });
+    }
+
+    function renderEventos() {
+      const lista = eventosFiltrados();
+
+      if (ubicacionFiltro && categoriaActiva !== "Todas") {
+        eventsMeta.textContent = `${lista.length} evento${lista.length === 1 ? "" : "s"} en “${ubicacionFiltro}” · ${categoriaActiva}`;
+      } else if (ubicacionFiltro) {
+        eventsMeta.textContent = `${lista.length} evento${lista.length === 1 ? "" : "s"} en “${ubicacionFiltro}”`;
+      } else if (categoriaActiva !== "Todas") {
+        eventsMeta.textContent = `${lista.length} evento${lista.length === 1 ? "" : "s"} · ${categoriaActiva}`;
+      } else {
+        eventsMeta.textContent = `${lista.length} eventos publicados`;
+      }
+
+      if (lista.length === 0) {
+        eventsGrid.innerHTML = `
+          <div class="empty-state">
+            <p>No hay eventos que coincidan con tu búsqueda.</p>
+            <p>Probá otra ubicación o categoría.</p>
+          </div>
+        `;
+        return;
+      }
+
+      eventsGrid.innerHTML = lista
+        .map(
+          (evento, index) => `
+        <article class="event-card" style="animation-delay: ${index * 0.05}s">
+          <div class="event-image" style="background-image: url('${evento.imagen}')">
+            <span class="event-badge">${evento.categoria}</span>
+          </div>
+          <div class="event-body">
+            <h3>${evento.titulo}</h3>
+            <p class="event-meta">${evento.fecha}</p>
+            <p class="event-meta">${evento.ubicacion}</p>
+            <p class="event-desc">${evento.descripcion}</p>
+          </div>
+        </article>
+      `
+        )
+        .join("");
+    }
+
+    categoryList.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-categoria]");
+      if (!btn) return;
+      categoriaActiva = btn.dataset.categoria;
+      renderCategorias();
+      renderEventos();
+    });
+
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      ubicacionFiltro = locationSearch.value.trim();
+      renderEventos();
+    });
+
+    locationSearch.addEventListener("input", () => {
+      if (locationSearch.value.trim() === "") {
+        ubicacionFiltro = "";
+        renderEventos();
+      }
+    });
+
+    function abrirLogin() {
+      loginError.textContent = "";
+      loginModal.classList.add("open");
+      document.getElementById("email").focus();
+    }
+
+    function cerrarLogin() {
+      loginModal.classList.remove("open");
+      loginForm.reset();
+      loginError.textContent = "";
+    }
+
+    function actualizarSesion() {
+      const usuario = localStorage.getItem("aura_user");
+      if (usuario) {
+        userChip.textContent = `Hola, ${usuario}`;
+        userChip.classList.add("visible");
+        btnLogin.hidden = true;
+        btnLogout.hidden = false;
+      } else {
+        userChip.textContent = "";
+        userChip.classList.remove("visible");
+        btnLogin.hidden = false;
+        btnLogout.hidden = true;
+      }
+    }
+
+    btnLogin.addEventListener("click", abrirLogin);
+    btnCancelLogin.addEventListener("click", cerrarLogin);
+
+    loginModal.addEventListener("click", (e) => {
+      if (e.target === loginModal) cerrarLogin();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") cerrarLogin();
+    });
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || password.length < 4) {
+        loginError.textContent = "Revisá tu email y contraseña (mín. 4 caracteres).";
+        return;
+      }
+
+      const nombre = email.split("@")[0];
+      localStorage.setItem("aura_user", nombre);
+      cerrarLogin();
+      actualizarSesion();
+    });
+
+    btnLogout.addEventListener("click", () => {
+      localStorage.removeItem("aura_user");
+      actualizarSesion();
+    });
+
+    renderCategorias();
+    renderEventos();
+    actualizarSesion();
+  </script>
+</body>
+</html>
