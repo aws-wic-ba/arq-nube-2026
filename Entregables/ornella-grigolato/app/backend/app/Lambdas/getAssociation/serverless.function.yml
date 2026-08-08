@@ -1,0 +1,17 @@
+getAssociation:
+  handler: app/Lambdas/getAssociation/index.handler
+  events:
+    - http:
+        path: /associations/{id}
+        method: get
+        cors: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:Query
+      Resource:
+        - arn:aws:dynamodb:us-east-1:222629888010:table/AssociationsTable
+        - arn:aws:dynamodb:us-east-1:222629888010:table/AssociationsTable/*
+  environment:
+    ASSOCIATIONS_TABLE_NAME: AssociationsTable

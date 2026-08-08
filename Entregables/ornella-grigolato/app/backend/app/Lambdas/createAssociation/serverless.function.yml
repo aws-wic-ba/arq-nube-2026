@@ -1,0 +1,25 @@
+createAssociation:
+  handler: app/Lambdas/createAssociation/index.handler
+  events:
+    - httpApi:
+        path: /createAssociation
+        method: post
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        # Query sobre slug-index: valida que el slug no esté tomado antes de crear.
+        - dynamodb:Query
+      Resource:
+        - arn:aws:dynamodb:us-east-1:222629888010:table/AssociationsTable
+        - arn:aws:dynamodb:us-east-1:222629888010:table/AssociationsTable/*
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+        - cognito-idp:AdminDeleteUser
+      Resource: arn:aws:cognito-idp:us-east-1:222629888010:userpool/${env:COGNITO_USER_POOL_ID}
+  environment:
+    ASSOCIATIONS_TABLE_NAME: AssociationsTable
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
