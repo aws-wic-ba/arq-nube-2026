@@ -3,8 +3,15 @@
 import os
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 
+from engine.models import parse_session_to_assessment
+from engine.rules import load_rules, evaluate_threats
+from engine.risk import calculate_risks
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", os.urandom(32))
+
+# Load threat rules at startup (fail fast if invalid)
+THREAT_RULES = load_rules()
 
 # Component definitions for the wizard
 COMPONENT_CATALOG = {
@@ -220,18 +227,43 @@ def step_properties():
 
     if request.method == "POST":
         properties = {}
+        errors = []
         for comp in selected_components:
             comp_props = {}
             for prop in COMPONENT_PROPERTIES.get(comp, []):
-                comp_props[prop["id"]] = request.form.get(f"{comp}__{prop['id']}") == "yes"
+                field_name = f"{comp}__{prop['id']}"
+                value = request.form.get(field_name)
+                if value is None:
+                    errors.append(f"{COMPONENT_CATALOG[comp]['label']}: respondé \"{prop['label']}\"")
+                    comp_props[prop["id"]] = None
+                else:
+                    comp_props[prop["id"]] = (value == "yes")
             properties[comp] = comp_props
 
-        general_controls = {}
+        general_controls_data = {}
         for ctrl in GENERAL_CONTROLS:
-            general_controls[ctrl["id"]] = request.form.get(f"general__{ctrl['id']}") == "yes"
+            field_name = f"general__{ctrl['id']}"
+            value = request.form.get(field_name)
+            if value is None:
+                errors.append(f"Controles transversales: respondé \"{ctrl['label']}\"")
+                general_controls_data[ctrl["id"]] = None
+            else:
+                general_controls_data[ctrl["id"]] = (value == "yes")
+
+        if errors:
+            return render_template(
+                "wizard/properties.html",
+                errors=errors,
+                selected_components=selected_components,
+                component_catalog=COMPONENT_CATALOG,
+                component_properties=COMPONENT_PROPERTIES,
+                general_controls=GENERAL_CONTROLS,
+                existing_props=properties,
+                existing_general=general_controls_data,
+            )
 
         assessment["properties"] = properties
-        assessment["general_controls"] = general_controls
+        assessment["general_controls"] = general_controls_data
         session["assessment"] = assessment
         return redirect(url_for("step_review"))
 
@@ -289,8 +321,98 @@ def step_review():
 
 @app.route("/assessment/analyze", methods=["POST"])
 def analyze():
-    """Placeholder for analysis — engine not yet implemented."""
-    return render_template("wizard/analyze_pending.html")
+    """Execute STRIDE threat modeling and risk analysis."""
+    assessment_data = session.get("assessment")
+    if not assessment_data or "properties" not in assessment_data:
+        flash("Iniciá una nueva evaluación primero.", "warning")
+        return redirect(url_for("index"))
+
+    # Parse session into normalized model
+    assessment = parse_session_to_assessment(assessment_data)
+
+    # Run engines
+    raw_findings = evaluate_threats(assessment, THREAT_RULES)
+    findings = calculate_risks(raw_findings, assessment)
+
+    # Build risk summary
+    risk_summary = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    for f in findings:
+        risk_summary[f["risk"]["level"]] += 1
+
+    # Build STRIDE summary
+    stride_categories = [
+        "Spoofing", "Tampering", "Repudiation",
+        "Information Disclosure", "Denial of Service", "Elevation of Privilege",
+    ]
+    stride_summary = {cat: 0 for cat in stride_categories}
+    for f in findings:
+        stride_summary[f["stride"]] += 1
+
+    # Build visualization nodes
+    viz_nodes = build_visualization(assessment, findings)
+
+    return render_template(
+        "result.html",
+        assessment=assessment,
+        findings=findings,
+        risk_summary=risk_summary,
+        stride_summary=stride_summary,
+        viz_nodes=viz_nodes,
+    )
+
+
+def build_visualization(assessment, findings):
+    """Generate visualization node list with threat counts."""
+    nodes = []
+
+    # Internet entry point
+    if assessment.context.internet_exposed:
+        nodes.append({
+            "type": "internet",
+            "icon": "&#127760;",
+            "label": "Internet",
+            "threat_count": 0,
+            "max_level": "",
+        })
+
+    # Component type display order
+    type_order = ["frontend", "api", "database", "files_storage", "queue_messaging", "external_system"]
+    icons = {
+        "frontend": "&#9741;",
+        "api": "&#8644;",
+        "database": "&#9707;",
+        "files_storage": "&#9776;",
+        "queue_messaging": "&#8651;",
+        "external_system": "&#9729;",
+    }
+    labels = {
+        "frontend": "Frontend",
+        "api": "API",
+        "database": "Database",
+        "files_storage": "Files / Storage",
+        "queue_messaging": "Queue / Messaging",
+        "external_system": "External System",
+    }
+
+    for comp_type in type_order:
+        if assessment.has_component(comp_type):
+            # Count threats and find max level for this component
+            comp_findings = [f for f in findings if f["component"] == comp_type]
+            threat_count = len(comp_findings)
+            max_level = ""
+            if comp_findings:
+                level_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+                max_level = max(comp_findings, key=lambda f: level_order.get(f["risk"]["level"], 0))["risk"]["level"]
+
+            nodes.append({
+                "type": comp_type,
+                "icon": icons.get(comp_type, ""),
+                "label": labels.get(comp_type, comp_type),
+                "threat_count": threat_count,
+                "max_level": max_level,
+            })
+
+    return nodes
 
 
 if __name__ == "__main__":

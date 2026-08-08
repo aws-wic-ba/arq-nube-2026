@@ -1,0 +1,178 @@
+[
+  {
+    "id": "THR-API-001",
+    "title": "API pública sin autenticación",
+    "component": "api",
+    "conditions": {
+      "api.internet_exposed": true,
+      "api.has_authentication": false
+    },
+    "stride": "Spoofing",
+    "base_likelihood": 4,
+    "base_impact": 4,
+    "description": "Una API expuesta a Internet sin autenticación permite que actores no verificados accedan a sus operaciones, facilitando suplantación de identidad.",
+    "control_id": "SEC-IAM-01",
+    "reference": "OWASP API Security Top 10 - API2:2023 Broken Authentication"
+  },
+  {
+    "id": "THR-API-002",
+    "title": "API sin autorización granular",
+    "component": "api",
+    "conditions": {
+      "api.has_authentication": true,
+      "api.has_authorization": false
+    },
+    "stride": "Elevation of Privilege",
+    "base_likelihood": 3,
+    "base_impact": 4,
+    "description": "Una API autenticada sin autorización por roles o scopes permite que usuarios legítimos accedan a operaciones fuera de su alcance, habilitando escalamiento de privilegios.",
+    "control_id": "SEC-IAM-02",
+    "reference": "OWASP API Security Top 10 - API1:2023 Broken Object Level Authorization"
+  },
+  {
+    "id": "THR-API-003",
+    "title": "API pública sin rate limiting",
+    "component": "api",
+    "conditions": {
+      "api.internet_exposed": true,
+      "api.has_rate_limiting": false
+    },
+    "stride": "Denial of Service",
+    "base_likelihood": 4,
+    "base_impact": 3,
+    "description": "Una API pública sin limitación de tasa es vulnerable a ataques de agotamiento de recursos y abuso automatizado.",
+    "control_id": "SEC-DOS-01",
+    "reference": "OWASP API Security Top 10 - API4:2023 Unrestricted Resource Consumption"
+  },
+  {
+    "id": "THR-API-004",
+    "title": "API sin validación de inputs",
+    "component": "api",
+    "conditions": {
+      "api.internet_exposed": true,
+      "api.has_input_validation": false
+    },
+    "stride": "Tampering",
+    "base_likelihood": 4,
+    "base_impact": 4,
+    "description": "Una API pública que no valida payloads de entrada es susceptible a inyección de datos maliciosos, manipulación de parámetros y explotación de lógica.",
+    "control_id": "SEC-INP-01",
+    "reference": "OWASP API Security Top 10 - API3:2023 Broken Object Property Level Authorization"
+  },
+  {
+    "id": "THR-API-005",
+    "title": "API sin cifrado en tránsito",
+    "component": "api",
+    "conditions": {
+      "api.internet_exposed": true,
+      "api.has_encryption_in_transit": false
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 4,
+    "base_impact": 5,
+    "description": "Una API pública sin TLS/HTTPS expone datos en tránsito a interceptación, lectura y modificación por atacantes en la red.",
+    "control_id": "SEC-TLS-01",
+    "reference": "NIST SP 800-52 Rev.2; AWS Well-Architected Security Pillar - SEC 9"
+  },
+  {
+    "id": "THR-DB-001",
+    "title": "Base de datos sensible sin cifrado en reposo",
+    "component": "database",
+    "conditions": {
+      "database.handles_sensitive_data": true,
+      "database.has_encryption_at_rest": false
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 3,
+    "base_impact": 5,
+    "description": "Datos sensibles almacenados sin cifrado en reposo quedan expuestos si el medio de almacenamiento es comprometido, robado o accedido por personal no autorizado.",
+    "control_id": "SEC-DATA-01",
+    "reference": "NIST SP 800-111; AWS Well-Architected Security Pillar - SEC 8"
+  },
+  {
+    "id": "THR-DB-002",
+    "title": "Base de datos accesible públicamente",
+    "component": "database",
+    "conditions": {
+      "database.internet_exposed": true
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 5,
+    "base_impact": 5,
+    "description": "Una base de datos accesible desde Internet aumenta drásticamente la superficie de ataque, exponiendo datos a escaneos, exploits y acceso no autorizado.",
+    "control_id": "SEC-NET-01",
+    "reference": "AWS Well-Architected Security Pillar - SEC 5; CIS Benchmark"
+  },
+  {
+    "id": "THR-DB-003",
+    "title": "Base de datos sin backups",
+    "component": "database",
+    "conditions": {
+      "database.has_backups": false
+    },
+    "stride": "Denial of Service",
+    "base_likelihood": 3,
+    "base_impact": 4,
+    "description": "Sin respaldos configurados, una pérdida de datos por falla, error humano o ataque resulta irrecuperable, afectando la disponibilidad del servicio.",
+    "control_id": "SEC-BKP-01",
+    "reference": "AWS Well-Architected Reliability Pillar - REL 9"
+  },
+  {
+    "id": "THR-FS-001",
+    "title": "Almacenamiento sensible sin cifrado",
+    "component": "files_storage",
+    "conditions": {
+      "files_storage.handles_sensitive_data": true,
+      "files_storage.has_encryption_at_rest": false
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 3,
+    "base_impact": 5,
+    "description": "Archivos sensibles almacenados sin cifrado en reposo pueden ser leídos si el acceso al storage es comprometido.",
+    "control_id": "SEC-DATA-01",
+    "reference": "NIST SP 800-111; AWS Well-Architected Security Pillar - SEC 8"
+  },
+  {
+    "id": "THR-FS-002",
+    "title": "Almacenamiento con acceso público",
+    "component": "files_storage",
+    "conditions": {
+      "files_storage.internet_exposed": true
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 5,
+    "base_impact": 4,
+    "description": "Object storage con acceso público habilita la descarga no autorizada de archivos, potencialmente exponiendo datos confidenciales o internos.",
+    "control_id": "SEC-NET-02",
+    "reference": "AWS Security Best Practices - S3 Block Public Access"
+  },
+  {
+    "id": "THR-EXT-001",
+    "title": "Integración externa sin autenticación",
+    "component": "external_system",
+    "conditions": {
+      "external_system.has_authentication": false
+    },
+    "stride": "Spoofing",
+    "base_likelihood": 3,
+    "base_impact": 4,
+    "description": "Una integración con un sistema externo sin autenticación mutua permite que un actor malicioso suplante al sistema legítimo o inyecte datos.",
+    "control_id": "SEC-IAM-03",
+    "reference": "NIST SP 800-207 Zero Trust Architecture - Principle 3"
+  },
+  {
+    "id": "THR-EXT-002",
+    "title": "Secretos sin gestión centralizada",
+    "component": "external_system",
+    "conditions": {
+      "external_system.has_secrets": true,
+      "external_system.has_managed_secrets": false
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 3,
+    "base_impact": 4,
+    "description": "Credenciales de integración que no se gestionan mediante un mecanismo centralizado (vault, secrets manager) pueden quedar en código, variables de entorno expuestas o archivos de configuración, facilitando su filtración.",
+    "control_id": "SEC-SEC-01",
+    "reference": "AWS Well-Architected Security Pillar - SEC 2; OWASP Secrets Management"
+  }
+]
