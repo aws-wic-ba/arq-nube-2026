@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # 1. Simulador de AWS (LocalStack - Versión Comunitaria Gratuita)
+  localstack:
+    container_name: aws_localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - localstack_data:/var/lib/localstack
+
+  # 2. Interfaz Gráfica (Frontend)
+  frontend:
+    container_name: inventario_frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - localstack
+
+volumes:
+  localstack_data:
