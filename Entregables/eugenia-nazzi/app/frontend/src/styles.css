@@ -1,0 +1,367 @@
+:root {
+  --color-verde: #2fae73;
+  --color-verde-oscuro: #1f7a52;
+  --color-crema: #faf6ec;
+  --color-crema-oscuro: #f2ead9;
+  --color-rosa: #e8a0bf;
+  --color-tostado: #c98b5e;
+  --color-texto: #223027;
+  --color-texto-suave: #5c6b62;
+  --radio: 16px;
+  --sombra: 0 4px 14px rgba(34, 48, 39, 0.08);
+  --fuente-titulo: "Fraunces", serif;
+  --fuente-texto: "DM Sans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-texto);
+  color: var(--color-texto);
+  background: var(--color-crema);
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--color-crema);
+}
+
+/* --- Header estilo "invitación" (banda verde con título serif) --- */
+.app-header {
+  background: var(--color-verde);
+  color: var(--color-crema);
+  padding: 1.5rem 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header h1 {
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  font-size: 1.9rem;
+  margin: 0 0 0.3rem;
+}
+
+.app-header p {
+  font-family: var(--fuente-texto);
+  font-size: 0.95rem;
+  opacity: 0.92;
+  margin: 0.2rem 0;
+}
+
+.estado-backend {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 0.8rem;
+}
+
+/* Decoración simple tipo garabato, sin depender de imágenes externas */
+.doodle {
+  position: absolute;
+  opacity: 0.5;
+}
+
+/* --- Contenido principal: layout en dos columnas para aprovechar el
+   ancho de pantalla y evitar scroll vertical innecesario --- */
+.app-content {
+  max-width: 1500px;
+  margin: -1.25rem auto 2rem;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .app-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: #ffffff;
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2 {
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+  margin-top: 0;
+}
+
+.card h3 {
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+  font-size: 1.15rem;
+}
+
+.nota-app {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+  margin-top: -0.5rem;
+}
+
+/* --- Formulario (columna angosta lateral, apilado vertical) --- */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+.formulario .boton-pill {
+  width: 100%;
+  text-align: center;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+  font-weight: 500;
+}
+
+.campo input,
+.campo select {
+  font-family: var(--fuente-texto);
+  padding: 0.5rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid #ddd3bf;
+  background: var(--color-crema);
+  color: var(--color-texto);
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: 2px solid var(--color-verde);
+  outline-offset: 1px;
+}
+
+/* --- Botón estilo píldora, como "Claro que voy" --- */
+.boton-pill {
+  font-family: var(--fuente-texto);
+  font-weight: 700;
+  background: var(--color-verde);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.boton-pill:hover:not(:disabled) {
+  background: var(--color-verde-oscuro);
+  transform: translateY(-1px);
+}
+
+.boton-pill:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.boton-pill.secundario {
+  background: #fff;
+  color: var(--color-verde-oscuro);
+  border: 1px solid var(--color-verde);
+  box-shadow: none;
+}
+
+.aviso-reconocido {
+  font-size: 0.85rem;
+  color: var(--color-verde-oscuro);
+  background: #eaf7f0;
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  margin-top: 0.5rem;
+}
+
+.aviso-error {
+  color: #a1394a;
+  background: #fbe9ec;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+/* --- Tabla / checklist --- */
+.resumen-planilla {
+  color: var(--color-texto-suave);
+  font-size: 0.92rem;
+}
+
+.tabla-controles {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.tabla-controles thead tr {
+  background: var(--color-crema-oscuro);
+  text-align: left;
+}
+
+.tabla-controles th {
+  padding: 0.55rem 0.5rem;
+  color: var(--color-verde-oscuro);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tabla-controles td {
+  padding: 0.5rem 0.5rem;
+  border-bottom: 1px solid #efe7d5;
+  vertical-align: middle;
+}
+
+.tabla-controles tr:hover td {
+  background: #fbf8f0;
+}
+
+.nombre-control {
+  color: var(--color-texto);
+}
+
+.nota-control {
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+  margin-top: 0.15rem;
+}
+
+.badge-categoria {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  margin-bottom: 0.3rem;
+}
+
+.badge-categoria.vacuna {
+  background: #eaf7f0;
+  color: var(--color-verde-oscuro);
+}
+
+.badge-categoria.control {
+  background: #fdeef4;
+  color: #a24a70;
+}
+
+.badge-categoria.manual {
+  background: #f5ece1;
+  color: var(--color-tostado);
+}
+
+.input-fecha,
+.input-frecuencia {
+  font-family: var(--fuente-texto);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ddd3bf;
+  background: var(--color-crema);
+  font-size: 0.85rem;
+}
+
+.input-frecuencia {
+  width: 64px;
+}
+
+.texto-guardando {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  color: var(--color-tostado);
+}
+
+.agregar-manual {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.agregar-manual input {
+  flex: 1;
+  font-family: var(--fuente-texto);
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #ddd3bf;
+  background: var(--color-crema);
+}
+
+/* --- Secciones colapsables por categoría --- */
+.seccion-categoria {
+  margin-bottom: 1rem;
+}
+
+.seccion-categoria:last-child {
+  margin-bottom: 0;
+}
+
+.cabecera-seccion {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-crema-oscuro);
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-family: var(--fuente-texto);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-verde-oscuro);
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+}
+
+.cabecera-seccion:hover {
+  background: #ece2ca;
+}
+
+.contador-seccion {
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
+/* --- Marcar "no aplica" --- */
+.etiqueta-na {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+  cursor: pointer;
+}
+
+.fila-no-aplica td {
+  opacity: 0.5;
+}
+
+.fila-no-aplica input:disabled {
+  cursor: not-allowed;
+}
