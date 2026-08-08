@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShibaShop — Carrito</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">🐕 ShibaShop</a>
+    <a href="/carrito" class="btn-carrito">
+      Carrito
+      <% if (itemsEnCarrito > 0) { %><span class="badge"><%= itemsEnCarrito %></span><% } %>
+    </a>
+  </header>
+
+  <main>
+    <h1>Tu carrito</h1>
+
+    <% if (pedido) { %>
+      <p class="aviso ok">¡Compra confirmada! Tu pedido es el <strong>#<%= pedido %></strong>.</p>
+    <% } %>
+    <% if (error) { %>
+      <p class="aviso error"><%= error %></p>
+    <% } %>
+
+    <% if (items.length === 0) { %>
+      <p class="vacio">No tenés productos en el carrito.</p>
+      <a href="/" class="btn-secundario">Volver al catálogo</a>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach(function (i) { %>
+            <tr>
+              <td><%= i.nombre %></td>
+              <td><%= formatearPrecio(i.precio) %></td>
+              <td class="centro"><%= i.cantidad %></td>
+              <td><%= formatearPrecio(i.subtotal) %></td>
+              <td>
+                <form method="POST" action="/carrito/eliminar">
+                  <input type="hidden" name="producto_id" value="<%= i.id %>">
+                  <button type="submit" class="btn-eliminar">Eliminar</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Total</strong></td>
+            <td colspan="2"><strong><%= formatearPrecio(total) %></strong></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="acciones">
+        <a href="/" class="btn-secundario">Seguir comprando</a>
+        <form method="POST" action="/carrito/vaciar">
+          <button type="submit" class="btn-secundario">Vaciar carrito</button>
+        </form>
+        <form method="POST" action="/carrito/confirmar">
+          <button type="submit" class="btn-confirmar">Confirmar compra</button>
+        </form>
+      </div>
+
+      <% if (recomendados && recomendados.length) { %>
+        <section class="recomendados">
+          <h2>Quienes compraron esto también llevaron</h2>
+          <div class="grilla-reco">
+            <% recomendados.forEach(function (r) { %>
+              <article class="reco">
+                <div class="imagen" data-producto="<%= r.imagen %>"></div>
+                <h3><%= r.nombre %></h3>
+                <p class="precio"><%= formatearPrecio(r.precio) %></p>
+                <form method="POST" action="/carrito/agregar">
+                  <input type="hidden" name="producto_id" value="<%= r.id %>">
+                  <input type="hidden" name="volver" value="carrito">
+                  <button type="submit">Agregar</button>
+                </form>
+              </article>
+            <% }); %>
+          </div>
+        </section>
+      <% } %>
+    <% } %>
+  </main>
+
+  <footer>TP Final — Arquitectura de Nube 2026 · AWS Women in Cloud Buenos Aires</footer>
+</body>
+</html>

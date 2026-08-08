@@ -1,0 +1,19 @@
+===============================================
+ PRUEBA DE PERSISTENCIA DEL CARRITO
+ ShibaShop · TP Final Arquitectura de Nube 2026
+===============================================
+
+Escenario: se arma un carrito, se reinicia el contenedor de la app
+           (equivale a que el Auto Scaling de baja esa instancia en AWS)
+           y se vuelve a consultar el carrito con la misma cookie.
+
+1. Agregando dos productos al carrito...
+   Carrito: Auriculares inalambricos | Monitor 27 pulgadas
+
+2. Reiniciando el contenedor de la app (simula perder la instancia)...
+   App de vuelta en linea
+
+3. Consultando el carrito con la MISMA cookie...
+   Carrito: Auriculares inalambricos | Monitor 27 pulgadas
+
+RESULTADO: CORRECTO — el carrito sobrevivio a la caida de la instancia.

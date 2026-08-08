@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: shibashop-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-shibashop}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-shibashop123}
+      POSTGRES_DB: ${DB_NAME:-shibashopdb}
+    volumes:
+      # Los datos sobreviven a `docker compose down`.
+      - datos-db:/var/lib/postgresql/data
+      # Se ejecuta solo la primera vez, cuando el volumen esta vacio.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-shibashop} -d ${DB_NAME:-shibashopdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - shibashop-net
+    # Sin `ports`: la base no se expone al host, solo la ve la app por la red interna.
+
+  app:
+    build: .
+    container_name: shibashop-app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-shibashop}
+      DB_PASSWORD: ${DB_PASSWORD:-shibashop123}
+      DB_NAME: ${DB_NAME:-shibashopdb}
+      COOKIE_SECRET: ${COOKIE_SECRET:-dev-secret-cambiar-en-produccion}
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - shibashop-net
+
+volumes:
+  datos-db:
+
+networks:
+  shibashop-net:
+    driver: bridge

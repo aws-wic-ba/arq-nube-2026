@@ -1,0 +1,33 @@
+===============================================
+ PRUEBA DE CONCURRENCIA — CHECKOUT
+ ShibaShop · TP Final Arquitectura de Nube 2026
+===============================================
+
+Escenario: 1 sola unidad en stock del producto 'Monitor 27 pulgadas'
+           25 compradores confirman la compra simultaneamente.
+
+Preparando 25 compradores, cada uno con el producto en su carrito...
+Disparando las confirmaciones TODAS AL MISMO TIEMPO...
+
+Compraron:  1
+Rechazados: 24
+Otros:      0
+Tiempo total: 251 ms
+
+Ganador: #2 (pedido #9)
+Motivo del rechazo: Sin stock suficiente de Monitor 27 pulgadas
+
+RESULTADO: CORRECTO — exactamente una compra prospero.
+
+--- Verificacion en PostgreSQL ---
+ stock_final | pedidos_creados | pedidos_sin_items 
+-------------+-----------------+-------------------
+           0 |               1 |                 0
+(1 row)
+
+Los 24 compradores rechazados conservan el producto en su carrito:
+ carritos_con_items 
+--------------------
+                 24
+(1 row)
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShibaShop — Catálogo</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">🐕 ShibaShop</a>
+    <a href="/carrito" class="btn-carrito">
+      Carrito
+      <% if (itemsEnCarrito > 0) { %><span class="badge"><%= itemsEnCarrito %></span><% } %>
+    </a>
+  </header>
+
+  <main>
+    <h1>Catálogo</h1>
+    <% if (agregado) { %>
+      <p class="aviso ok">Producto agregado al carrito.</p>
+    <% } %>
+
+    <div class="grilla">
+      <% productos.forEach(function (p) { %>
+        <article class="producto">
+          <div class="imagen" data-producto="<%= p.imagen %>"></div>
+          <h2><%= p.nombre %></h2>
+          <p class="descripcion"><%= p.descripcion %></p>
+          <p class="precio"><%= formatearPrecio(p.precio) %></p>
+          <% if (p.stock > 0) { %>
+            <p class="stock">Stock: <%= p.stock %></p>
+            <form method="POST" action="/carrito/agregar">
+              <input type="hidden" name="producto_id" value="<%= p.id %>">
+              <button type="submit">Agregar al carrito</button>
+            </form>
+          <% } else { %>
+            <p class="stock agotado">Sin stock</p>
+            <button type="button" disabled>Agotado</button>
+          <% } %>
+        </article>
+      <% }); %>
+    </div>
+  </main>
+
+  <footer>TP Final — Arquitectura de Nube 2026 · AWS Women in Cloud Buenos Aires</footer>
+</body>
+</html>

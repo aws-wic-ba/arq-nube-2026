@@ -1,0 +1,161 @@
+:root {
+  --tinta: #16213a;
+  --gris: #667085;
+  --borde: #e3e6ee;
+  --fondo: #f6f7fb;
+  --acento: #2f5bea;
+  --ok: #0f8a5f;
+  --error: #c1372c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--fondo);
+  color: var(--tinta);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background: #fff;
+  border-bottom: 1px solid var(--borde);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo { font-size: 1.25rem; font-weight: 700; text-decoration: none; color: var(--tinta); }
+
+.btn-carrito {
+  text-decoration: none;
+  color: var(--tinta);
+  font-weight: 600;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: var(--acento);
+  color: #fff;
+  border-radius: 999px;
+  min-width: 1.4rem;
+  padding: 0 0.4rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+main { max-width: 1080px; width: 100%; margin: 0 auto; padding: 2rem; flex: 1; }
+h1 { margin-bottom: 1.5rem; font-size: 1.75rem; }
+
+.aviso { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
+.aviso.ok { background: #e4f5ee; color: var(--ok); }
+.aviso.error { background: #fdeceb; color: var(--error); }
+
+.grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+
+.producto {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Placeholder de imagen: en AWS estas imagenes irian en S3 + CloudFront. */
+.imagen {
+  height: 140px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #eef1fb, #dde4f8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+.imagen::after { content: "📦"; }
+.imagen[data-producto="auriculares"]::after { content: "🎧"; }
+.imagen[data-producto="teclado"]::after { content: "⌨️"; }
+.imagen[data-producto="mouse"]::after { content: "🖱️"; }
+.imagen[data-producto="monitor"]::after { content: "🖥️"; }
+.imagen[data-producto="webcam"]::after { content: "📷"; }
+.imagen[data-producto="silla"]::after { content: "💺"; }
+
+.producto h2 { font-size: 1.05rem; }
+.descripcion { color: var(--gris); font-size: 0.875rem; flex: 1; }
+.precio { font-size: 1.25rem; font-weight: 700; }
+.stock { font-size: 0.8rem; color: var(--gris); }
+.stock.agotado { color: var(--error); }
+
+button {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  background: var(--acento);
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+}
+button:hover:not(:disabled) { filter: brightness(0.92); }
+button:disabled { background: var(--borde); color: var(--gris); cursor: not-allowed; }
+
+table { width: 100%; background: #fff; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--borde); }
+th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--borde); }
+th { background: #fafbfe; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--gris); }
+tfoot td { border-bottom: none; font-size: 1.1rem; }
+.centro { text-align: center; }
+
+.btn-eliminar { background: none; color: var(--error); width: auto; padding: 0.35rem 0.6rem; }
+.btn-eliminar:hover { background: #fdeceb; filter: none; }
+
+.acciones { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.acciones form { margin: 0; }
+.btn-secundario {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  background: #fff;
+  color: var(--tinta);
+  cursor: pointer;
+  width: auto;
+}
+.btn-confirmar { width: auto; background: var(--ok); }
+
+.vacio { color: var(--gris); margin-bottom: 1rem; }
+
+/* Recomendaciones: salen de cruzar los pedidos historicos, no de un servicio
+   externo. Ver la consulta en src/server.js. */
+.recomendados { margin-top: 2.5rem; border-top: 1px solid var(--borde); padding-top: 1.75rem; }
+.recomendados h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+
+.grilla-reco { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+
+.reco {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.reco .imagen { height: 96px; font-size: 1.75rem; }
+.reco h3 { font-size: 0.95rem; font-weight: 600; }
+.reco .precio { font-size: 1.05rem; }
+.reco button { padding: 0.5rem 0.75rem; font-size: 0.9rem; }
+
+footer { text-align: center; padding: 1.5rem; color: var(--gris); font-size: 0.8rem; }
