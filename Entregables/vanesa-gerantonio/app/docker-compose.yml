@@ -1,0 +1,31 @@
+﻿name: organicloud
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-desarrollo-local-solamente}
+      DATABASE_URL: postgresql+psycopg://organicloud:organicloud@db:5432/organicloud
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: organicloud
+      POSTGRES_USER: organicloud
+      POSTGRES_PASSWORD: organicloud
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U organicloud -d organicloud"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  postgres_data:
+
