@@ -1,0 +1,7 @@
+[2026-08-07 23:00:02] [INFO] Processed: Task definition revision 3 initialized successfully.
+[2026-08-07 23:00:03] [INFO] Uvicorn running on http://0.0.0 (Press CTRL+C to quit)
+[2026-08-07 23:00:03] [INFO] Application startup complete.
+[2026-08-07 23:01:15] [INFO] 10.0.0.12 - "GET /health HTTP/1.1" 200 OK (Host: ://catalogo-app.com)
+[2026-08-07 23:02:01] [INFO] 10.0.1.45 - "POST /products HTTP/1.1" 201 Created (Host: ://catalogo-app.com)
+[2026-08-07 23:02:14] [INFO] 10.0.0.88 - "GET /products/PROD-100 HTTP/1.1" 200 OK (Host: ://catalogo-app.com)
+[2026-08-07 23:02:30] [INFO] 10.0.1.20 - "GET /products?limit=5 HTTP/1.1" 200 OK (Host: ://catalogo-app.com)
