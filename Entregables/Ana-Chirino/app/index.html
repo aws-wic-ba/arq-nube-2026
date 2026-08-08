@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockFlow - POS & Inventario</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col md:flex-row">
+
+  <!-- Navegación Lateral / Inferior -->
+  <aside class="w-full md:w-64 bg-slate-800 border-r border-slate-700 p-4 flex md:flex-col justify-between items-center md:items-start shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="bg-indigo-600 p-2 rounded-xl text-white">
+        <i data-feather="box"></i>
+      </div>
+      <h1 class="text-xl font-bold tracking-wide text-indigo-400">StockFlow</h1>
+    </div>
+
+    <!-- Menú de opciones -->
+    <nav class="hidden md:flex flex-col gap-2 w-full mt-8">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-600/20 text-indigo-400 rounded-xl font-medium border border-indigo-500/30">
+        <i data-feather="shopping-cart" class="w-5 h-5"></i> Punto de Venta
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 rounded-xl font-medium transition">
+        <i data-feather="package" class="w-5 h-5"></i> Inventario
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 rounded-xl font-medium transition">
+        <i data-feather="bar-chart-2" class="w-5 h-5"></i> Reportes
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 rounded-xl font-medium transition">
+        <i data-feather="settings" class="w-5 h-5"></i> Ajustes
+      </a>
+    </nav>
+
+    <!-- Usuario -->
+    <div class="hidden md:flex items-center gap-3 p-2 bg-slate-700/40 w-full rounded-xl border border-slate-700">
+      <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center flex-shrink-0 justify-center font-bold">
+        A
+      </div>
+      <div class="overflow-hidden">
+        <p class="text-sm font-semibold truncate">Mi Comercio</p>
+        <p class="text-xs text-slate-400 truncate">admin@stockflow.app</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Contenido Principal (Catálogo) -->
+  <main class="flex-1 p-4 md:p-6 overflow-y-auto">
+    <!-- Encabezado con buscador -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div>
+        <h2 class="text-2xl font-bold">Registrar Venta</h2>
+        <p class="text-sm text-slate-400">Selecciona productos para añadir al pedido</p>
+      </div>
+      <div class="relative w-full sm:w-72">
+        <i data-feather="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+        <input type="text" placeholder="Buscar por nombre o código..." 
+               class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500 transition">
+      </div>
+    </header>
+
+    <!-- Grid de Productos -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      
+      <!-- Tarjeta Producto 1 -->
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition cursor-pointer group">
+        <div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-1 rounded-md">Stock: 24</span>
+            <button class="text-slate-400 group-hover:text-indigo-400 transition"><i data-feather="plus-circle" class="w-5 h-5"></i></button>
+          </div>
+          <h3 class="font-semibold text-slate-200">imanes vinilo tornasol</h3>
+          <p class="text-xs text-slate-400 mt-1">imanes</p>
+        </div>
+        <p class="text-lg font-bold text-indigo-400 mt-4">$ 1.500</p>
+      </div>
+
+      <!-- Tarjeta Producto 2 -->
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition cursor-pointer group">
+        <div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-amber-500/10 text-amber-400 text-xs font-semibold px-2 py-1 rounded-md">Stock: 3 (Bajo)</span>
+            <button class="text-slate-400 group-hover:text-indigo-400 transition"><i data-feather="plus-circle" class="w-5 h-5"></i></button>
+          </div>
+          <h3 class="font-semibold text-slate-200">mate calabaza</h3>
+          <p class="text-xs text-slate-400 mt-1">Mates</p>
+        </div>
+        <p class="text-lg font-bold text-indigo-400 mt-4">$ 4.500</p>
+      </div>
+
+      <!-- Tarjeta Producto 3 -->
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition cursor-pointer group">
+        <div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-1 rounded-md">Stock: 50</span>
+            <button class="text-slate-400 group-hover:text-indigo-400 transition"><i data-feather="plus-circle" class="w-5 h-5"></i></button>
+          </div>
+          <h3 class="font-semibold text-slate-200">escarapela grande dije</h3>
+          <p class="text-xs text-slate-400 mt-1">Escarapelas</p>
+        </div>
+        <p class="text-lg font-bold text-indigo-400 mt-4">$ 3.500</p>
+      </div>
+
+      <!-- Tarjeta Producto 4 -->
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/50 transition cursor-pointer group">
+        <div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-1 rounded-md">Stock: 18</span>
+            <button class="text-slate-400 group-hover:text-indigo-400 transition"><i data-feather="plus-circle" class="w-5 h-5"></i></button>
+          </div>
+          <h3 class="font-semibold text-slate-200">iman vinilo comun</h3>
+          <p class="text-xs text-slate-400 mt-1">imanes</p>
+        </div>
+        <p class="text-lg font-bold text-indigo-400 mt-4">$ 850</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Panel de Ticket / Cesta (Derecha) -->
+  <section class="w-full md:w-80 bg-slate-800/90 border-t md:border-t-0 md:border-l border-slate-700 p-4 flex flex-col justify-between shrink-0">
+    <div>
+      <div class="flex justify-between items-center pb-4 border-b border-slate-700">
+        <h3 class="font-bold text-lg">Ticket de Venta</h3>
+        <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded-md">2 Ítems</span>
+      </div>
+
+      <!-- Lista de Ítems en el Carrito -->
+      <div class="mt-4 flex flex-col gap-3 max-h-64 md:max-h-96 overflow-y-auto">
+        
+        <div class="flex justify-between items-center bg-slate-900/50 p-3 rounded-xl border border-slate-700/50">
+          <div>
+            <p class="text-sm font-medium">Iman vinilo tornasol</p>
+            <p class="text-xs text-slate-400">3 x $ 1.500</p>
+          </div>
+          <span class="font-bold text-sm">$ 4.500</span>
+        </div>
+
+        <div class="flex justify-between items-center bg-slate-900/50 p-3 rounded-xl border border-slate-700/50">
+          <div>
+            <p class="text-sm font-medium">Mate calabaza</p>
+            <p class="text-xs text-slate-400">1 x $ 4.500</p>
+          </div>
+          <span class="font-bold text-sm">$ 4.500</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Resumen de Pago y Botón de Cobro -->
+    <div class="mt-6 border-t border-slate-700 pt-4">
+      <div class="flex justify-between text-sm text-slate-400 mb-2">
+        <span>Subtotal</span>
+        <span>$ 9.000</span>
+      </div>
+      <div class="flex justify-between text-lg font-bold text-slate-100 mb-4">
+        <span>Total</span>
+        <span class="text-indigo-400">$ 9.000</span>
+      </div>
+
+      <button class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+        <i data-feather="check-circle" class="w-5 h-5"></i> Confirmar Venta
+      </button>
+    </div>
+  </section>
+
+  <!-- Inicializar Íconos -->
+  <script>
+    feather.replace();
+  </script>
+</body>
+</html>
