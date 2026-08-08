@@ -1,0 +1,21 @@
+getPrivateAssociation:
+  handler: app/Lambdas/getPrivateAssociation/index.handler
+  events:
+    - http:
+        path: /private/associations/{id}
+        method: get
+        cors: true
+        authorizer:
+          name: cognitoAuthorizer
+          type: COGNITO_USER_POOLS
+          arn: arn:aws:cognito-idp:${aws:region}:${aws:accountId}:userpool/${env:COGNITO_USER_POOL_ID}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:Query
+      Resource:
+        - arn:aws:dynamodb:us-east-1:222629888010:table/AssociationsTable
+        - arn:aws:dynamodb:us-east-1:222629888010:table/AssociationsTable/*
+  environment:
+    ASSOCIATIONS_TABLE_NAME: AssociationsTable

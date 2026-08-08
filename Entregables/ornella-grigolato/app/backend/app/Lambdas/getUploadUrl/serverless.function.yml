@@ -1,0 +1,15 @@
+getUploadUrl:
+  handler: app/Lambdas/getUploadUrl/index.handler
+  events:
+    - http:
+        path: /upload-url
+        method: get
+        cors: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource:
+        - arn:aws:s3:::morar-refugios-images/*
+  environment:
+    UPLOADS_BUCKET_NAME: morar-refugios-images

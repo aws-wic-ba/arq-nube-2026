@@ -1,0 +1,25 @@
+org: proyectofinal
+app: refugio-app
+service: refugio-app
+frameworkVersion: "4"
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: dev2
+  region: us-east-1
+  httpApi:
+    cors: true
+    throttle:
+      rateLimit: 2
+      burstLimit: 5
+
+build:
+  esbuild: true
+
+functions:
+  - ${file(app/Lambdas/createAssociation/serverless.function.yml)}
+  - ${file(app/Lambdas/getAssociation/serverless.function.yml)}
+  - ${file(app/Lambdas/getPrivateAssociation/serverless.function.yml)}
+  - ${file(app/Lambdas/getUploadUrl/serverless.function.yml)}

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "lib": ["es2022", "dom"],
+    "sourceMap": true,
+    "module": "commonjs",
+    "checkJs": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "target": "es2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["node", "jest"],
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "Helpers/*": ["app/Helpers/*"],
+      "Types/*": ["app/Types/*"]
+    }
+  },
+  "include": ["./**/*.ts", "app/Types"]
+}

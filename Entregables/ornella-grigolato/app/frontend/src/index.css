@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-cream: #fbf9f6;
+  --color-cream-200: #f4eee6;
+
+  --color-terracotta-50: #fbf1ec;
+  --color-terracotta-100: #f6dfd2;
+  --color-terracotta-200: #eec0a7;
+  --color-terracotta-300: #e39d7c;
+  --color-terracotta-400: #d57952;
+  --color-terracotta-500: #c15f3a;
+  --color-terracotta-600: #a34b2c;
+  --color-terracotta-700: #7d3a22;
+
+  /* Animación de entrada/salida del modal de éxito. */
+  --animate-backdrop-in: backdrop-in 180ms ease-out;
+  --animate-dialog-in: dialog-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-dialog-out: dialog-out 140ms ease-in forwards;
+  --animate-check-pop: check-pop 460ms cubic-bezier(0.34, 1.56, 0.64, 1) 60ms
+    both;
+  --animate-halo: halo 900ms ease-out 140ms;
+
+  /* Animación del menú lateral del dashboard en mobile. */
+  --animate-drawer-in: drawer-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-drawer-out: drawer-out 160ms ease-in forwards;
+
+  @keyframes drawer-in {
+    from {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes drawer-out {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes dialog-out {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+  }
+
+  @keyframes check-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes halo {
+    from {
+      opacity: 0.5;
+      transform: scale(0.75);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.9);
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
