@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Paso 1 — Contexto | Secure Design Advisor{% endblock %}
+
+{% block content %}
+{% include "wizard/_progress.html" %}
+
+<h1 class="h3 mb-4">Contexto de la solución</h1>
+
+{% if errors %}
+<div class="alert alert-danger" role="alert">
+    <ul class="mb-0">
+    {% for e in errors %}
+        <li>{{ e }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('step_context') }}">
+    <!-- Identification -->
+    <fieldset class="mb-4">
+        <legend class="h5">Identificación</legend>
+        <div class="mb-3">
+            <label for="solution_name" class="form-label">Nombre de la solución <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="solution_name" name="solution_name"
+                   value="{{ form.get('solution_name', '') }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción breve</label>
+            <textarea class="form-control" id="description" name="description" rows="2">{{ form.get('description', '') }}</textarea>
+        </div>
+    </fieldset>
+
+    <!-- Solution Type -->
+    <fieldset class="mb-4">
+        <legend class="h5">Tipo de solución <span class="text-danger">*</span></legend>
+        <div class="row g-2">
+        {% for st in solution_types %}
+            <div class="col-6 col-md-4">
+                <input type="radio" class="btn-check" name="solution_type" id="type_{{ st.id }}"
+                       value="{{ st.id }}" autocomplete="off"
+                       {{ 'checked' if form.get('solution_type') == st.id else '' }}>
+                <label class="btn btn-outline-secondary w-100" for="type_{{ st.id }}">{{ st.label }}</label>
+            </div>
+        {% endfor %}
+        </div>
+    </fieldset>
+
+    <!-- Criticality -->
+    <fieldset class="mb-4">
+        <legend class="h5">Criticidad <span class="text-danger">*</span></legend>
+        <p class="text-muted small">¿Qué impacto tiene si la solución deja de funcionar?</p>
+        <div class="row g-2">
+        {% for c in criticality_levels %}
+            <div class="col-6 col-md-3">
+                <input type="radio" class="btn-check" name="criticality" id="crit_{{ c.id }}"
+                       value="{{ c.id }}" autocomplete="off"
+                       {{ 'checked' if form.get('criticality') == c.id else '' }}>
+                <label class="btn btn-outline-secondary w-100 text-start" for="crit_{{ c.id }}">
+                    <strong>{{ c.label }}</strong><br>
+                    <small class="text-muted">{{ c.description }}</small>
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    </fieldset>
+
+    <!-- General Context -->
+    <fieldset class="mb-4">
+        <legend class="h5">Contexto general</legend>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="internet_exposed" name="internet_exposed" value="yes"
+                           {{ 'checked' if form.get('internet_exposed') else '' }}>
+                    <label class="form-check-label" for="internet_exposed">Expuesta a Internet</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="external_users" name="external_users" value="yes"
+                           {{ 'checked' if form.get('external_users') else '' }}>
+                    <label class="form-check-label" for="external_users">Usuarios externos</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="sensitive_data" name="sensitive_data" value="yes"
+                           {{ 'checked' if form.get('sensitive_data') else '' }}>
+                    <label class="form-check-label" for="sensitive_data">Procesa datos sensibles</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="third_party" name="third_party" value="yes"
+                           {{ 'checked' if form.get('third_party') else '' }}>
+                    <label class="form-check-label" for="third_party">Se integra con terceros</label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Siguiente &rarr;</button>
+    </div>
+</form>
+{% endblock %}

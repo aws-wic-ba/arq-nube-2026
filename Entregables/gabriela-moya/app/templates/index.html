@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Secure Design Advisor — Home{% endblock %}
+
+{% block content %}
+<section class="text-center py-5">
+    <h1 class="display-5 fw-bold">Secure Design Advisor</h1>
+    <p class="lead text-muted mb-3">Security by Design for Cloud Architects</p>
+    <p class="col-lg-8 mx-auto mb-4">
+        Evaluá la postura de seguridad de tu arquitectura cloud de forma temprana.
+        La herramienta analiza tus componentes y controles declarados, identifica amenazas
+        mediante STRIDE, calcula riesgos, evalúa alineamiento con Zero Trust y recomienda
+        controles y servicios AWS — todo de forma determinística y explicable.
+    </p>
+    <a href="/assessment/new" class="btn btn-primary btn-lg" role="button">
+        Nueva Evaluación
+    </a>
+</section>
+
+<section class="row text-center mt-4">
+    <div class="col-md-4 mb-3">
+        <h2 class="h5">Threat Modeling</h2>
+        <p class="text-muted small">Identifica amenazas STRIDE a partir de las características de tu diseño.</p>
+    </div>
+    <div class="col-md-4 mb-3">
+        <h2 class="h5">Risk Assessment</h2>
+        <p class="text-muted small">Calcula riesgo con probabilidad, impacto y modificadores contextuales.</p>
+    </div>
+    <div class="col-md-4 mb-3">
+        <h2 class="h5">Security Gate</h2>
+        <p class="text-muted small">Obtené un resultado claro: Aprobado, Con Observaciones, o Requiere Revisión.</p>
+    </div>
+</section>
+{% endblock %}

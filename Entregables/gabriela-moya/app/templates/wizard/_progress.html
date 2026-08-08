@@ -1,0 +1,21 @@
+{% set steps = [
+    {"name": "Contexto", "url": "step_context"},
+    {"name": "Componentes", "url": "step_components"},
+    {"name": "Seguridad", "url": "step_properties"},
+    {"name": "Revisión", "url": "step_review"},
+] %}
+
+{% set current_url = request.endpoint %}
+
+<nav aria-label="Progreso del wizard" class="mb-4">
+    <ol class="wizard-progress">
+    {% for step in steps %}
+        {% set is_current = (step.url == current_url) %}
+        {% set step_num = loop.index %}
+        <li class="wizard-step {{ 'active' if is_current else '' }}">
+            <span class="step-number">{{ step_num }}</span>
+            <span class="step-label">{{ step.name }}</span>
+        </li>
+    {% endfor %}
+    </ol>
+</nav>

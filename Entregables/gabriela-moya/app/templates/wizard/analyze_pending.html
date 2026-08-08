@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Análisis pendiente | Secure Design Advisor{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="h3 mb-3">Assessment capturado correctamente</h1>
+    <p class="lead text-muted mb-4">
+        El motor de análisis (STRIDE, Risk, Zero Trust) aún no está implementado.
+    </p>
+    <p class="text-muted">
+        Cuando esté listo, este paso ejecutará:
+    </p>
+    <ul class="list-unstyled text-muted">
+        <li>Threat Modeling mediante reglas STRIDE</li>
+        <li>Cálculo de riesgo con modificadores contextuales</li>
+        <li>Evaluación preliminar de alineamiento Zero Trust</li>
+        <li>Generación de requisitos y recomendaciones AWS</li>
+        <li>Security Architecture Gate</li>
+    </ul>
+    <a href="{{ url_for('step_review') }}" class="btn btn-outline-secondary mt-3">&larr; Volver a revisión</a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-primary mt-3">Inicio</a>
+</div>
+{% endblock %}
