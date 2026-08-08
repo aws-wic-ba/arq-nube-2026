@@ -1,0 +1,6 @@
+{
+  "framework": "vite",
+  "installCommand": "cd zerototech && npm install",
+  "buildCommand": "cd zerototech && npm run build",
+  "outputDirectory": "zerototech/dist"
+}
