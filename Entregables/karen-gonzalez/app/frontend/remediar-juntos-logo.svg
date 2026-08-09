@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+  <defs>
+    <!-- Gradientes para dar un acabado moderno tipo Startup -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0D6EFD" />
+      <stop offset="100%" stop-color="#0A58CA" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#20C997" />
+      <stop offset="100%" stop-color="#198754" />
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <!-- ISOTIPO: Cruz médica estilizada formada por dos manos/cápsulas en abrazo -->
+  <g transform="translate(10, 10)" filter="url(#softShadow)">
+    <!-- Cápsula / Módulo Azul (Confianza/Salud) -->
+    <path d="M 55,20 C 35,20 20,35 20,55 C 20,70 30,85 55,98 C 58,96 62,93 65,90 C 45,75 38,60 38,50 C 38,38 46,30 55,30 C 64,30 70,36 73,43 C 78,35 83,28 88,23 C 80,21 67,20 55,20 Z" fill="url(#blueGrad)" />
+    
+    <!-- Cápsula / Módulo Verde (Solidaridad/Esperanza) -->
+    <path d="M 45,20 C 37,20 30,24 25,30 C 32,38 38,48 45,58 C 48,45 56,38 65,38 C 74,38 82,46 82,58 C 82,72 65,88 55,98 C 68,90 88,72 88,52 C 88,32 72,20 55,20 C 51,20 48,20 45,20 Z" fill="url(#greenGrad)" />
+    
+    <!-- Detalle de la Cruz de Salud interior (Blanco) -->
+    <path d="M 50,42 H 60 V 48 H 66 V 58 H 60 V 64 H 50 V 58 H 44 V 48 H 50 Z" fill="#FFFFFF" opacity="0.9" />
+  </g>
+
+  <!-- LOGOTIPO: Tipografía -->
+  <g transform="translate(120, 72)">
+    <!-- 'Remediar' en Azul e Negrita -->
+    <text font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="42" font-weight="800" fill="#0D6EFD" letter-spacing="-0.5">Remediar</text>
+    <!-- 'Juntos' en Verde y estilo Medium -->
+    <text x="185" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="42" font-weight="400" fill="#198754" letter-spacing="-0.5">Juntos</text>
+    <!-- Bajada / Eslogan -->
+    <text x="2" y="24" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#6C757D" letter-spacing="1.5">RED SOLIDARIA DE MEDICAMENTOS</text>
+  </g>
+</svg>

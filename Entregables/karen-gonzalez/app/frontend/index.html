@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RemediarJuntos — Red Solidaria de Medicamentos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { background-color: #f8f9fa; font-family: system-ui, -apple-system, sans-serif; }
+    .hero-header { background: #ffffff; border-bottom: 1px solid #e9ecef; padding: 20px 0; }
+    #map { height: 320px; border-radius: 12px; border: 1px solid #dee2e6; }
+    .card-campana { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; }
+    .card-campana:hover { transform: translateY(-3px); }
+    .badge-distancia { background-color: #e8f5e9; color: #198754; font-weight: 600; }
+    .logo-img { max-width: 280px; height: auto; display: block; }
+  </style>
+</head>
+<body>
+
+  <header class="hero-header shadow-sm mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div>
+        <img src="remediar-juntos-logo.svg" alt="RemediarJuntos Logo" class="logo-img">
+      </div>
+      <div>
+        <button class="btn btn-outline-primary btn-sm me-2" onclick="mostrarPagina('campanas')">🔍 Campañas Cercanas</button>
+        <button class="btn btn-primary btn-sm" onclick="mostrarPagina('donar')">❤️ Registrar Donación</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <div id="pagina-campanas">
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="card p-3 border-0 shadow-sm">
+            <h5 class="fw-bold text-dark mb-2">📍 Puntos de Recepción Cercanos (PostGIS Spatial Index)</h5>
+            <p class="text-muted small mb-3">Geolocalización activa para detectar fundaciones a menos de 10 km de tu ubicación.</p>
+            <div id="map"></div>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="fw-bold mb-3">Campañas Críticas Activas</h4>
+      <div class="row" id="contenedor-campanas">
+      </div>
+    </div>
+
+    <div id="pagina-donar" style="display: none;">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card p-4 card-campana">
+            <h4 class="fw-bold text-primary mb-3">Registrar Donación de Medicamentos</h4>
+            <form id="form-donacion" onsubmit="enviarDonacion(event)">
+              <div class="mb-3">
+                <label class="form-label font-weight-bold">Seleccionar Campaña / Institución</label>
+                <select class="form-select" id="select-campana" required></select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nombre del Donante / Empresa</label>
+                <input type="text" class="form-control" id="input-donante" placeholder="Ej: María González" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Medicamento a Donar</label>
+                <input type="text" class="form-control" id="input-medicamento" placeholder="Ej: Mercaptopurina 50mg" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Cantidad (Unidades/Cajas)</label>
+                <input type="number" class="form-control" id="input-cantidad" min="1" value="1" required>
+              </div>
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary" onclick="mostrarPagina('campanas')">Cancelar</button>
+                <button type="submit" class="btn btn-success">Confirmar Donación</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let map, campanasData = [];
+
+    async function cargarCampanas() {
+      try {
+        const res = await fetch('/api/campanas');
+        campanasData = await res.json();
+        renderizarTarjetas();
+        renderizarMapa();
+        renderizarSelect();
+      } catch (err) {
+        console.error("Error al conectar con la API:", err);
+      }
+    }
+
+    function renderizarTarjetas() {
+      const cont = document.getElementById('contenedor-campanas');
+      cont.innerHTML = '';
+      campanasData.forEach(c => {
+        const pct = Math.min(100, Math.round((c.recaudado / c.meta) * 100));
+        cont.innerHTML += `
+          <div class="col-md-4 mb-3">
+            <div class="card p-3 card-campana h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge badge-distancia">📍 a ${c.distancia_km} km</span>
+                <small class="text-muted">${c.direccion}</small>
+              </div>
+              <h6 class="fw-bold mb-1">${c.institucion}</h6>
+              <p class="text-primary fw-bold mb-2">${c.medicamento}</p>
+              <div class="progress mb-2" style="height: 10px;">
+                <div class="progress-bar bg-success" style="width: ${pct}%"></div>
+              </div>
+              <div class="d-flex justify-content-between small text-muted">
+                <span>Recaudado: ${c.recaudado}/${c.meta}</span>
+                <span>${pct}%</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderizarMapa() {
+      if (!map) {
+        map = L.map('map').setView([-34.6037, -58.3816], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+      }
+      campanasData.forEach(c => {
+        L.marker([c.lat, c.lng]).addTo(map)
+          .bindPopup(`<b>${c.institucion}</b><br>${c.medicamento}<br><i>A ${c.distancia_km} km de tu ubicación</i>`);
+      });
+    }
+
+    function renderizarSelect() {
+      const sel = document.getElementById('select-campana');
+      sel.innerHTML = '';
+      campanasData.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.institucion} - ${c.medicamento}</option>`;
+      });
+    }
+
+    function mostrarPagina(pag) {
+      document.getElementById('pagina-campanas').style.display = (pag === 'campanas') ? 'block' : 'none';
+      document.getElementById('pagina-donar').style.display = (pag === 'donar') ? 'block' : 'none';
+    }
+
+    async function enviarDonacion(e) {
+      e.preventDefault();
+      const payload = {
+        campana_id: parseInt(document.getElementById('select-campana').value),
+        donante: document.getElementById('input-donante').value,
+        medicamento: document.getElementById('input-medicamento').value,
+        cantidad: parseInt(document.getElementById('input-cantidad').value)
+      };
+
+      const res = await fetch('/api/donaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        alert("¡Muchas gracias! Donación registrada correctamente.");
+        document.getElementById('form-donacion').reset();
+        await cargarCampanas();
+        mostrarPagina('campanas');
+      }
+    }
+
+    cargarCampanas();
+  </script>
+</body>
+</html>
