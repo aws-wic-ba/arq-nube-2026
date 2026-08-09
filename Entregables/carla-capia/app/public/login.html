@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PeluApp | Administración</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="container narrow">
+    <section class="card login-card">
+      <a href="/" class="back">← Volver</a>
+      <span class="badge">Administración</span>
+      <h2>Ingresar al panel</h2>
+      <p>Usá las credenciales demo incluidas para la ejecución local.</p>
+      <form id="loginForm">
+        <label>Usuario
+          <input id="username" value="admin" required>
+        </label>
+        <label>Contraseña
+          <input id="password" type="password" value="peluapp2026" required>
+        </label>
+        <button class="button" type="submit">Ingresar</button>
+        <p id="loginMessage" class="message"></p>
+      </form>
+    </section>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

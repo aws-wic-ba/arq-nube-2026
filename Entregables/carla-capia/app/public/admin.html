@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PeluApp | Panel Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <span class="eyebrow">ADMINISTRACIÓN</span>
+      <h1>PeluApp</h1>
+    </div>
+    <a class="button secondary" href="/">Nueva reserva</a>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <span class="badge">Agenda</span>
+        <h2>Turnos registrados</h2>
+        <p>Consultá la agenda y cancelá reservas cuando sea necesario.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Profesional</th><th>Estado</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="appointmentsBody"></tbody>
+        </table>
+      </div>
+      <p id="adminMessage" class="message"></p>
+    </section>
+  </main>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
