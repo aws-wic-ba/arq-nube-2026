@@ -382,7 +382,9 @@ def api_assess():
 # Serve static frontend
 # ===========================================================================
 
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "frontend")
+FRONTEND_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "frontend")
+)
 
 
 @app.route("/app/")

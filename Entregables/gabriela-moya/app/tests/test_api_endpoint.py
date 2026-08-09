@@ -89,12 +89,51 @@ class TestFrontendServing:
     def test_app_route_serves_html(self, client):
         resp = client.get("/app/")
         assert resp.status_code == 200
+        assert resp.content_type.startswith("text/html")
         assert b"Secure Design Advisor" in resp.data
+
+    def test_app_without_trailing_slash_redirects(self, client):
+        resp = client.get("/app")
+        assert resp.status_code == 308
 
     def test_app_css_serves(self, client):
         resp = client.get("/app/css/style.css")
         assert resp.status_code == 200
+        assert "text/css" in resp.content_type
+        assert len(resp.data) > 0
 
-    def test_app_js_serves(self, client):
+    def test_app_js_app_serves(self, client):
         resp = client.get("/app/js/app.js")
         assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_app_js_wizard_serves(self, client):
+        resp = client.get("/app/js/wizard.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_app_js_api_serves(self, client):
+        resp = client.get("/app/js/api.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_app_js_result_serves(self, client):
+        resp = client.get("/app/js/result.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_app_js_catalogs_serves(self, client):
+        resp = client.get("/app/js/catalogs.js")
+        assert resp.status_code == 200
+        assert "javascript" in resp.content_type
+
+    def test_index_html_references_resolve(self, client):
+        """All asset references in index.html must be servable."""
+        resp = client.get("/app/")
+        html = resp.data.decode()
+        # Extract relative src/href (excluding CDN links)
+        import re
+        local_refs = re.findall(r'(?:src|href)="([^"h][^"]*)"', html)
+        for ref in local_refs:
+            asset_resp = client.get(f"/app/{ref}")
+            assert asset_resp.status_code == 200, f"Asset not found: /app/{ref}"
