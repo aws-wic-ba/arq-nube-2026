@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Paso 2 — Componentes | Secure Design Advisor{% endblock %}
+
+{% block content %}
+{% include "wizard/_progress.html" %}
+
+<h1 class="h3 mb-4">Componentes de la arquitectura</h1>
+<p class="text-muted mb-4">Seleccioná los componentes que forman parte de tu solución.</p>
+
+{% if errors %}
+<div class="alert alert-danger" role="alert">
+    <ul class="mb-0">
+    {% for e in errors %}
+        <li>{{ e }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('step_components') }}">
+    <div class="row g-3 mb-4">
+    {% for comp_id, comp in components.items() %}
+        <div class="col-sm-6 col-md-4">
+            <div class="card h-100 component-card {{ 'border-primary' if comp_id in selected else '' }}">
+                <label class="card-body d-flex flex-column" for="comp_{{ comp_id }}" role="button">
+                    <div class="d-flex align-items-center mb-2">
+                        <input class="form-check-input me-2" type="checkbox"
+                               id="comp_{{ comp_id }}" name="components" value="{{ comp_id }}"
+                               {{ 'checked' if comp_id in selected else '' }}>
+                        <span class="component-icon me-2">{{ comp.icon | safe }}</span>
+                        <strong>{{ comp.label }}</strong>
+                    </div>
+                    <small class="text-muted">{{ comp.description }}</small>
+                </label>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ url_for('step_context') }}" class="btn btn-outline-secondary">&larr; Anterior</a>
+        <button type="submit" class="btn btn-primary">Siguiente &rarr;</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,196 @@
+{
+  "Comment": "Secure Design Advisor — Assessment Analysis Workflow (Express Synchronous)",
+  "StartAt": "Initialize",
+  "States": {
+    "Initialize": {
+      "Type": "Pass",
+      "Parameters": {
+        "assessment_id.$": "States.UUID()",
+        "created_at.$": "$$.State.EnteredTime",
+        "input.$": "$.assessment_data"
+      },
+      "Next": "Validate"
+    },
+    "Validate": {
+      "Type": "Task",
+      "Resource": "${ValidateFunctionArn}",
+      "Parameters": {
+        "assessment_data.$": "$.input"
+      },
+      "ResultPath": "$.validation",
+      "Next": "MergeValidation",
+      "Catch": [
+        {
+          "ErrorEquals": ["ValidationError"],
+          "Next": "FailValidation"
+        }
+      ]
+    },
+    "MergeValidation": {
+      "Type": "Pass",
+      "Parameters": {
+        "assessment_id.$": "$.assessment_id",
+        "created_at.$": "$.created_at",
+        "input.$": "$.input",
+        "assessment.$": "$.validation.assessment"
+      },
+      "Next": "PersistProcessing"
+    },
+    "PersistProcessing": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "${AssessmentsTableName}",
+        "Item": {
+          "assessment_id": { "S.$": "$.assessment_id" },
+          "status": { "S": "PROCESSING" },
+          "created_at": { "S.$": "$.created_at" },
+          "updated_at": { "S.$": "$.created_at" },
+          "input": { "S.$": "States.JsonToString($.input)" }
+        }
+      },
+      "ResultPath": "$.persist",
+      "Next": "PrunePayload"
+    },
+    "PrunePayload": {
+      "Type": "Pass",
+      "Comment": "Remove raw input from envelope to reduce payload size for subsequent states",
+      "Parameters": {
+        "assessment_id.$": "$.assessment_id",
+        "created_at.$": "$.created_at",
+        "assessment.$": "$.assessment"
+      },
+      "Next": "ThreatAnalysis"
+    },
+    "ThreatAnalysis": {
+      "Type": "Task",
+      "Resource": "${ThreatAnalysisFunctionArn}",
+      "Parameters": {
+        "assessment.$": "$.assessment"
+      },
+      "ResultPath": "$.analysis",
+      "Next": "RiskEvaluation",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "MaxAttempts": 1,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "PersistFailed"
+        }
+      ]
+    },
+    "RiskEvaluation": {
+      "Type": "Task",
+      "Resource": "${RiskEvaluationFunctionArn}",
+      "Parameters": {
+        "assessment.$": "$.assessment",
+        "findings.$": "$.analysis.findings"
+      },
+      "ResultPath": "$.evaluation",
+      "Next": "BuildResult",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "MaxAttempts": 1,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "PersistFailed"
+        }
+      ]
+    },
+    "BuildResult": {
+      "Type": "Task",
+      "Resource": "${BuildResultFunctionArn}",
+      "Parameters": {
+        "assessment.$": "$.assessment",
+        "findings_with_risk.$": "$.evaluation.findings_with_risk",
+        "zt_report.$": "$.evaluation.zt_report",
+        "gate.$": "$.evaluation.gate",
+        "recommendations.$": "$.evaluation.recommendations"
+      },
+      "ResultPath": "$.build",
+      "Next": "PersistCompleted",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "PersistFailed"
+        }
+      ]
+    },
+    "PersistCompleted": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Parameters": {
+        "TableName": "${AssessmentsTableName}",
+        "Key": {
+          "assessment_id": { "S.$": "$.assessment_id" }
+        },
+        "UpdateExpression": "SET #s = :status, #r = :result, completed_at = :completed_at, updated_at = :updated_at",
+        "ExpressionAttributeNames": {
+          "#s": "status",
+          "#r": "result"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "COMPLETED" },
+          ":result": { "S.$": "States.JsonToString($.build.result)" },
+          ":completed_at": { "S.$": "$$.State.EnteredTime" },
+          ":updated_at": { "S.$": "$$.State.EnteredTime" }
+        }
+      },
+      "ResultPath": "$.persist",
+      "Next": "FormatOutput"
+    },
+    "FormatOutput": {
+      "Type": "Pass",
+      "Parameters": {
+        "assessment_id.$": "$.assessment_id",
+        "result.$": "$.build.result"
+      },
+      "End": true
+    },
+    "PersistFailed": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Parameters": {
+        "TableName": "${AssessmentsTableName}",
+        "Key": {
+          "assessment_id": { "S.$": "$.assessment_id" }
+        },
+        "UpdateExpression": "SET #s = :status, #e = :error, failed_at = :failed_at, updated_at = :updated_at",
+        "ExpressionAttributeNames": {
+          "#s": "status",
+          "#e": "error"
+        },
+        "ExpressionAttributeValues": {
+          ":status": { "S": "FAILED" },
+          ":error": { "S.$": "States.JsonToString($.error)" },
+          ":failed_at": { "S.$": "$$.State.EnteredTime" },
+          ":updated_at": { "S.$": "$$.State.EnteredTime" }
+        }
+      },
+      "Next": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail",
+      "Cause": "Assessment analysis failed after processing started",
+      "Error": "ProcessingError"
+    },
+    "FailValidation": {
+      "Type": "Fail",
+      "Cause": "Assessment input validation failed",
+      "Error": "ValidationError"
+    }
+  }
+}

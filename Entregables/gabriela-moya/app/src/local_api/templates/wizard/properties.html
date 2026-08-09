@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Paso 3 — Seguridad | Secure Design Advisor{% endblock %}
+
+{% block content %}
+{% include "wizard/_progress.html" %}
+
+<h1 class="h3 mb-4">Controles de seguridad</h1>
+<p class="text-muted mb-4">Respondé sobre los controles actuales de cada componente. Todas las preguntas requieren respuesta explícita.</p>
+
+{% if errors %}
+<div class="alert alert-danger" role="alert">
+    <ul class="mb-0">
+    {% for e in errors %}
+        <li>{{ e }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('step_properties') }}">
+    <!-- Per-component properties -->
+    <div class="accordion mb-4" id="componentAccordion">
+    {% for comp_id in selected_components %}
+        {% set comp_info = component_catalog[comp_id] %}
+        {% set props = component_properties.get(comp_id, []) %}
+        {% set existing = existing_props.get(comp_id, {}) %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading_{{ comp_id }}">
+                <button class="accordion-button {{ '' if loop.first else 'collapsed' }}" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#collapse_{{ comp_id }}"
+                        aria-expanded="{{ 'true' if loop.first else 'false' }}"
+                        aria-controls="collapse_{{ comp_id }}">
+                    <span class="component-icon me-2">{{ comp_info.icon | safe }}</span>
+                    {{ comp_info.label }}
+                </button>
+            </h2>
+            <div id="collapse_{{ comp_id }}" class="accordion-collapse collapse {{ 'show' if loop.first else '' }}"
+                 aria-labelledby="heading_{{ comp_id }}" data-bs-parent="#componentAccordion">
+                <div class="accordion-body">
+                    {% for prop in props %}
+                    <div class="mb-3 prop-question">
+                        <label class="form-label fw-semibold">{{ prop.label }}</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="{{ comp_id }}__{{ prop.id }}" id="{{ comp_id }}__{{ prop.id }}_yes"
+                                       value="yes" {{ 'checked' if existing.get(prop.id) == true else '' }}>
+                                <label class="form-check-label" for="{{ comp_id }}__{{ prop.id }}_yes">Sí</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       name="{{ comp_id }}__{{ prop.id }}" id="{{ comp_id }}__{{ prop.id }}_no"
+                                       value="no" {{ 'checked' if existing.get(prop.id) == false else '' }}>
+                                <label class="form-check-label" for="{{ comp_id }}__{{ prop.id }}_no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+    <!-- General / cross-cutting controls -->
+    <fieldset class="mb-4">
+        <legend class="h5">Controles transversales</legend>
+        <p class="text-muted small">Indicá los controles generales que aplican a la solución completa.</p>
+        {% for ctrl in general_controls %}
+        <div class="mb-3 prop-question">
+            <label class="form-label fw-semibold">{{ ctrl.label }}</label>
+            <div class="d-flex gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="general__{{ ctrl.id }}" id="general__{{ ctrl.id }}_yes"
+                           value="yes" {{ 'checked' if existing_general.get(ctrl.id) == true else '' }}>
+                    <label class="form-check-label" for="general__{{ ctrl.id }}_yes">Sí</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio"
+                           name="general__{{ ctrl.id }}" id="general__{{ ctrl.id }}_no"
+                           value="no" {{ 'checked' if existing_general.get(ctrl.id) == false else '' }}>
+                    <label class="form-check-label" for="general__{{ ctrl.id }}_no">No</label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </fieldset>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ url_for('step_components') }}" class="btn btn-outline-secondary">&larr; Anterior</a>
+        <button type="submit" class="btn btn-primary">Siguiente &rarr;</button>
+    </div>
+</form>
+{% endblock %}

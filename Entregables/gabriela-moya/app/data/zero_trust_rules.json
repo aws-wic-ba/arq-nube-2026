@@ -1,0 +1,105 @@
+{
+  "dimensions": [
+    {
+      "id": "identity",
+      "name": "Identity",
+      "description": "Verificación de identidad de actores que acceden al sistema.",
+      "checks": [
+        {
+          "id": "zt-id-01",
+          "description": "Componentes expuestos a Internet requieren autenticación",
+          "logic": "all_exposed_have_auth",
+          "evidence_template": "Componentes expuestos: {exposed} | Con autenticación: {authenticated}"
+        },
+        {
+          "id": "zt-id-02",
+          "description": "Integraciones externas verifican identidad del tercero",
+          "logic": "external_systems_authenticate",
+          "evidence_template": "External system autenticación: {value}"
+        }
+      ]
+    },
+    {
+      "id": "access",
+      "name": "Access / Least Privilege",
+      "description": "Control de acceso granular y mínimo privilegio.",
+      "checks": [
+        {
+          "id": "zt-ac-01",
+          "description": "APIs con autenticación implementan autorización granular",
+          "logic": "api_has_authorization",
+          "evidence_template": "API autenticación: {auth} | Autorización: {authz}"
+        },
+        {
+          "id": "zt-ac-02",
+          "description": "Se aplican permisos de mínimo privilegio",
+          "logic": "least_privilege_applied",
+          "evidence_template": "Least privilege: {value}"
+        },
+        {
+          "id": "zt-ac-03",
+          "description": "No existen credenciales compartidas",
+          "logic": "no_shared_credentials",
+          "evidence_template": "Credenciales compartidas: {value}"
+        }
+      ]
+    },
+    {
+      "id": "data_protection",
+      "name": "Data Protection",
+      "description": "Protección de datos en reposo y en tránsito.",
+      "checks": [
+        {
+          "id": "zt-dp-01",
+          "description": "Datos sensibles cifrados en reposo",
+          "logic": "sensitive_data_encrypted_at_rest",
+          "evidence_template": "Stores con datos sensibles: {stores} | Cifrados: {encrypted}"
+        },
+        {
+          "id": "zt-dp-02",
+          "description": "Comunicaciones utilizan cifrado en tránsito",
+          "logic": "communications_encrypted",
+          "evidence_template": "Componentes con TLS: {with_tls} / {total}"
+        }
+      ]
+    },
+    {
+      "id": "segmentation",
+      "name": "Segmentation / Communications",
+      "description": "Segmentación de red y control de comunicaciones.",
+      "checks": [
+        {
+          "id": "zt-sg-01",
+          "description": "Bases de datos no son accesibles públicamente",
+          "logic": "databases_not_public",
+          "evidence_template": "Base de datos pública: {value}"
+        },
+        {
+          "id": "zt-sg-02",
+          "description": "Storage no tiene acceso público innecesario",
+          "logic": "storage_not_public",
+          "evidence_template": "Storage público: {value}"
+        }
+      ]
+    },
+    {
+      "id": "visibility",
+      "name": "Visibility / Traceability",
+      "description": "Observabilidad y trazabilidad de acciones.",
+      "checks": [
+        {
+          "id": "zt-vs-01",
+          "description": "Existen logs de seguridad",
+          "logic": "has_security_logs",
+          "evidence_template": "Security logs: {value}"
+        },
+        {
+          "id": "zt-vs-02",
+          "description": "Acciones administrativas son trazables",
+          "logic": "has_audit_trail",
+          "evidence_template": "Audit trail: {value}"
+        }
+      ]
+    }
+  ]
+}

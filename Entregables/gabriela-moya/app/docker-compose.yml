@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=dev-only-not-for-production
+      - PYTHONPATH=/app/src

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Paso 4 — Revisión | Secure Design Advisor{% endblock %}
+
+{% block content %}
+{% include "wizard/_progress.html" %}
+
+<h1 class="h3 mb-4">Revisión del assessment</h1>
+<p class="text-muted mb-4">Verificá que la información capturada sea correcta antes de ejecutar el análisis.</p>
+
+<!-- Context summary -->
+<div class="card mb-3">
+    <div class="card-header"><strong>Solución</strong></div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Nombre</dt>
+            <dd class="col-sm-8">{{ context.solution_name }}</dd>
+            {% if context.description %}
+            <dt class="col-sm-4">Descripción</dt>
+            <dd class="col-sm-8">{{ context.description }}</dd>
+            {% endif %}
+            <dt class="col-sm-4">Tipo</dt>
+            <dd class="col-sm-8">{{ type_label }}</dd>
+            <dt class="col-sm-4">Criticidad</dt>
+            <dd class="col-sm-8"><span class="badge bg-{{ 'danger' if context.criticality == 'critical' else 'warning' if context.criticality == 'high' else 'info' if context.criticality == 'medium' else 'secondary' }}">{{ crit_label }}</span></dd>
+        </dl>
+    </div>
+</div>
+
+<!-- General context -->
+<div class="card mb-3">
+    <div class="card-header"><strong>Contexto general</strong></div>
+    <div class="card-body">
+        <ul class="list-unstyled mb-0">
+            <li>{{ "✓" if context.internet_exposed else "✗" }} Expuesta a Internet</li>
+            <li>{{ "✓" if context.external_users else "✗" }} Usuarios externos</li>
+            <li>{{ "✓" if context.sensitive_data else "✗" }} Datos sensibles</li>
+            <li>{{ "✓" if context.third_party else "✗" }} Integración con terceros</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Components -->
+<div class="card mb-3">
+    <div class="card-header"><strong>Componentes</strong></div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+        {% for comp_id in components %}
+            <span class="badge bg-primary fs-6">{{ component_catalog[comp_id].icon | safe }} {{ component_catalog[comp_id].label }}</span>
+        {% endfor %}
+        </div>
+
+        {% for comp_id in components %}
+        {% set comp_info = component_catalog[comp_id] %}
+        {% set comp_props = properties.get(comp_id, {}) %}
+        {% set prop_defs = component_properties.get(comp_id, []) %}
+        <h6 class="mt-3">{{ comp_info.label }}</h6>
+        <ul class="list-unstyled small">
+            {% for prop in prop_defs %}
+            <li>{{ "✓" if comp_props.get(prop.id) else "✗" }} {{ prop.label }}</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- General controls -->
+<div class="card mb-3">
+    <div class="card-header"><strong>Controles transversales</strong></div>
+    <div class="card-body">
+        <ul class="list-unstyled mb-0">
+        {% for ctrl in general_controls_def %}
+            <li>{{ "✓" if general_controls.get(ctrl.id) else "✗" }} {{ ctrl.label }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Actions -->
+<div class="d-flex justify-content-between mt-4">
+    <a href="{{ url_for('step_properties') }}" class="btn btn-outline-secondary">&larr; Editar controles</a>
+    <form method="POST" action="{{ url_for('analyze') }}">
+        <button type="submit" class="btn btn-success btn-lg">Analizar Arquitectura &rarr;</button>
+    </form>
+</div>
+{% endblock %}

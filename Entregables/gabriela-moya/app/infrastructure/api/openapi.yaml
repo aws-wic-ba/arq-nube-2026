@@ -1,0 +1,115 @@
+openapi: "3.0.1"
+info:
+  title: "Secure Design Advisor API"
+  description: "Security architecture assessment via STRIDE threat modeling"
+  version: "1.0.0"
+
+paths:
+  /api/assess:
+    post:
+      summary: "Submit assessment for analysis"
+      description: |
+        Invokes Step Functions Express Workflow synchronously.
+        Returns complete AssessmentResult or error.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssessmentRequest'
+      responses:
+        '200':
+          description: "Analysis completed successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssessmentResponse'
+        '400':
+          description: "Validation error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: "Processing error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessingErrorResponse'
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: "arn:aws:apigateway:${AWS::Region}:states:action/StartSyncExecution"
+        credentials: "${ApiGatewayStepFunctionsRole.Arn}"
+        requestTemplates:
+          application/json: |
+            {
+              "stateMachineArn": "${AssessmentWorkflowArn}",
+              "input": "$util.escapeJavaScript($input.body)"
+            }
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: |
+                #set($output = $util.parseJson($input.body))
+                #if($output.status == "SUCCEEDED")
+                $output.output
+                #elseif($output.error == "ValidationError")
+                #set($context.responseOverride.status = 400)
+                {"error":"validation_error","details":$output.cause}
+                #else
+                #set($context.responseOverride.status = 500)
+                {"error":"processing_error","message":"$output.cause"}
+                #end
+
+components:
+  schemas:
+    AssessmentRequest:
+      type: object
+      required: [assessment_data]
+      properties:
+        assessment_data:
+          type: object
+          required: [context, components, properties, general_controls]
+          properties:
+            context:
+              type: object
+              required: [solution_name, solution_type, criticality, internet_exposed, external_users, sensitive_data, third_party]
+              properties:
+                solution_name: { type: string, minLength: 1 }
+                description: { type: string }
+                solution_type: { type: string, enum: [web_application, api, serverless, integration, data_pipeline, other] }
+                criticality: { type: string, enum: [low, medium, high, critical] }
+                internet_exposed: { type: boolean }
+                external_users: { type: boolean }
+                sensitive_data: { type: boolean }
+                third_party: { type: boolean }
+            components:
+              type: array
+              items: { type: string, enum: [frontend, api, database, files_storage, queue_messaging, external_system] }
+              minItems: 1
+            properties:
+              type: object
+            general_controls:
+              type: object
+
+    AssessmentResponse:
+      type: object
+      properties:
+        assessment_id: { type: string }
+        result:
+          type: object
+          description: "Canonical AssessmentResult"
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error: { type: string, example: "validation_error" }
+        details: { type: array, items: { type: string } }
+
+    ProcessingErrorResponse:
+      type: object
+      properties:
+        error: { type: string, example: "processing_error" }
+        message: { type: string }
