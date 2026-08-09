@@ -1,0 +1,100 @@
+{
+  "SEC-IAM-01": {
+    "requirement": "Implementar autenticación para todos los endpoints públicos.",
+    "control": "API Authentication (OAuth 2.0 / API Keys)",
+    "aws_services": ["Amazon Cognito", "API Gateway Authorizers"],
+    "explanation": "API Gateway Authorizers validan tokens de identidad antes de que las requests lleguen al backend. Cognito gestiona pools de usuarios e identidades federadas.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 2"
+  },
+  "SEC-IAM-02": {
+    "requirement": "Aplicar autorización granular basada en roles o scopes.",
+    "control": "Fine-grained Authorization (RBAC/ABAC)",
+    "aws_services": ["Amazon Cognito Groups", "API Gateway Resource Policies", "IAM Policies"],
+    "explanation": "La autenticación identifica al consumidor, mientras que la autorización limita qué operaciones puede ejecutar según su rol o atributos.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 3"
+  },
+  "SEC-IAM-03": {
+    "requirement": "Autenticar mutuamente las integraciones con sistemas externos.",
+    "control": "Mutual TLS / API Key Authentication",
+    "aws_services": ["API Gateway Mutual TLS", "AWS Certificate Manager"],
+    "explanation": "La autenticación mutua garantiza que ambos extremos de una integración verifican la identidad del otro, previniendo suplantación.",
+    "reference": "NIST SP 800-207 - Zero Trust Principle 3"
+  },
+  "SEC-DOS-01": {
+    "requirement": "Implementar rate limiting y throttling en endpoints públicos.",
+    "control": "API Rate Limiting / Throttling",
+    "aws_services": ["API Gateway Throttling", "AWS WAF Rate-based Rules"],
+    "explanation": "API Gateway permite throttling por método. WAF con reglas rate-based bloquea IPs que exceden umbrales de requests.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 6"
+  },
+  "SEC-INP-01": {
+    "requirement": "Validar y sanitizar todos los inputs en endpoints públicos.",
+    "control": "Input Validation / WAF Rules",
+    "aws_services": ["AWS WAF", "API Gateway Request Validation"],
+    "explanation": "WAF filtra payloads maliciosos (SQLi, XSS). API Gateway valida schemas de request antes de pasar al backend.",
+    "reference": "OWASP Input Validation Cheat Sheet"
+  },
+  "SEC-TLS-01": {
+    "requirement": "Cifrar todas las comunicaciones en tránsito mediante TLS.",
+    "control": "TLS/HTTPS Enforcement",
+    "aws_services": ["AWS Certificate Manager", "CloudFront HTTPS", "ALB/API Gateway TLS"],
+    "explanation": "ACM provisiona certificados TLS sin costo. CloudFront y API Gateway fuerzan HTTPS, eliminando comunicaciones en texto plano.",
+    "reference": "NIST SP 800-52 Rev.2"
+  },
+  "SEC-DATA-01": {
+    "requirement": "Cifrar datos sensibles en reposo utilizando algoritmos estándar.",
+    "control": "Encryption at Rest (AES-256)",
+    "aws_services": ["AWS KMS", "DynamoDB Encryption", "RDS Encryption"],
+    "explanation": "KMS centraliza gestión de claves. DynamoDB y RDS soportan cifrado nativo at rest usando claves KMS-managed.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 8"
+  },
+  "SEC-DATA-02": {
+    "requirement": "Cifrar comunicaciones del frontend mediante HTTPS.",
+    "control": "HTTPS / TLS Termination",
+    "aws_services": ["CloudFront", "AWS Certificate Manager", "ALB HTTPS Listener"],
+    "explanation": "CloudFront termina TLS en el edge, reduciendo latencia. ACM renueva certificados automáticamente.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 9"
+  },
+  "SEC-DATA-03": {
+    "requirement": "Cifrar mensajes sensibles en tránsito y en reposo.",
+    "control": "Message Encryption",
+    "aws_services": ["Amazon SQS Encryption", "Amazon SNS Encryption", "AWS KMS"],
+    "explanation": "SQS y SNS soportan cifrado server-side con claves KMS. Esto protege mensajes en reposo dentro del broker.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 8"
+  },
+  "SEC-NET-01": {
+    "requirement": "Ubicar bases de datos en subnets privadas sin acceso público.",
+    "control": "Private Subnet Placement / Security Groups",
+    "aws_services": ["Amazon VPC", "Security Groups", "RDS Private Subnet"],
+    "explanation": "Las bases de datos deben estar en subnets privadas sin route a Internet Gateway. Security Groups restringen acceso solo desde la capa de aplicación.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 5"
+  },
+  "SEC-NET-02": {
+    "requirement": "Bloquear acceso público a object storage salvo necesidad explícita.",
+    "control": "S3 Block Public Access",
+    "aws_services": ["S3 Block Public Access", "S3 Bucket Policies", "CloudFront OAI"],
+    "explanation": "S3 Block Public Access previene exposición accidental. Para contenido público, usar CloudFront con Origin Access Identity.",
+    "reference": "AWS Security Best Practices - S3"
+  },
+  "SEC-BKP-01": {
+    "requirement": "Configurar backups automáticos con retención definida.",
+    "control": "Automated Backups / Point-in-Time Recovery",
+    "aws_services": ["RDS Automated Backups", "DynamoDB PITR", "AWS Backup"],
+    "explanation": "RDS ofrece backups automáticos con PITR. AWS Backup centraliza políticas de respaldo cross-service.",
+    "reference": "AWS Well-Architected Reliability Pillar - REL 9"
+  },
+  "SEC-SEC-01": {
+    "requirement": "Gestionar secretos mediante un mecanismo centralizado.",
+    "control": "Centralized Secrets Management",
+    "aws_services": ["AWS Secrets Manager", "AWS Systems Manager Parameter Store"],
+    "explanation": "Secrets Manager rota credenciales automáticamente. Parameter Store ofrece almacenamiento seguro de configuración. Ambos eliminan secretos hardcodeados.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 2"
+  },
+  "SEC-LOG-01": {
+    "requirement": "Implementar trazabilidad de acciones administrativas y eventos de seguridad.",
+    "control": "Audit Logging / CloudTrail",
+    "aws_services": ["AWS CloudTrail", "Amazon CloudWatch Logs"],
+    "explanation": "CloudTrail registra todas las llamadas API a servicios AWS. CloudWatch Logs centraliza logs de aplicación para correlación y alertas.",
+    "reference": "AWS Well-Architected Security Pillar - SEC 4"
+  }
+}

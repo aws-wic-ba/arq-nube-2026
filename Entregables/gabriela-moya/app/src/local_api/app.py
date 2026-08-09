@@ -1,17 +1,20 @@
 """Secure Design Advisor — Security by Design for Cloud Architects."""
 
 import os
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+import uuid
+from flask import Flask, render_template, request, session, redirect, url_for, flash, jsonify, send_from_directory
 
-from engine.models import parse_session_to_assessment
-from engine.rules import load_rules, evaluate_threats
-from engine.risk import calculate_risks
+from engine.rules import load_rules
+from engine.recommendations import load_controls
+from engine.pipeline import run_analysis
+from engine.contracts import validate_assessment_input, result_to_dict
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", os.urandom(32))
 
-# Load threat rules at startup (fail fast if invalid)
+# Load rule catalogs at startup (fail fast if invalid)
 THREAT_RULES = load_rules()
+AWS_CONTROLS = load_controls()
 
 # Component definitions for the wizard
 COMPONENT_CATALOG = {
@@ -321,98 +324,72 @@ def step_review():
 
 @app.route("/assessment/analyze", methods=["POST"])
 def analyze():
-    """Execute STRIDE threat modeling and risk analysis."""
+    """Execute full analysis via the framework-agnostic pipeline."""
     assessment_data = session.get("assessment")
     if not assessment_data or "properties" not in assessment_data:
         flash("Iniciá una nueva evaluación primero.", "warning")
         return redirect(url_for("index"))
 
-    # Parse session into normalized model
-    assessment = parse_session_to_assessment(assessment_data)
-
-    # Run engines
-    raw_findings = evaluate_threats(assessment, THREAT_RULES)
-    findings = calculate_risks(raw_findings, assessment)
-
-    # Build risk summary
-    risk_summary = {"critical": 0, "high": 0, "medium": 0, "low": 0}
-    for f in findings:
-        risk_summary[f["risk"]["level"]] += 1
-
-    # Build STRIDE summary
-    stride_categories = [
-        "Spoofing", "Tampering", "Repudiation",
-        "Information Disclosure", "Denial of Service", "Elevation of Privilege",
-    ]
-    stride_summary = {cat: 0 for cat in stride_categories}
-    for f in findings:
-        stride_summary[f["stride"]] += 1
-
-    # Build visualization nodes
-    viz_nodes = build_visualization(assessment, findings)
+    # Delegate to framework-agnostic pipeline
+    result = run_analysis(assessment_data, THREAT_RULES, AWS_CONTROLS)
 
     return render_template(
         "result.html",
-        assessment=assessment,
-        findings=findings,
-        risk_summary=risk_summary,
-        stride_summary=stride_summary,
-        viz_nodes=viz_nodes,
+        assessment=result["assessment"],
+        findings=result["findings"],
+        risk_summary=result["risk_summary"],
+        stride_summary=result["stride_summary"],
+        overall_risk=result["overall_risk"],
+        viz_nodes=result["viz_nodes"],
+        zt_report=result["zt_report"],
+        gate=result["gate"],
+        recommendations=result["recommendations"],
     )
 
 
-def build_visualization(assessment, findings):
-    """Generate visualization node list with threat counts."""
-    nodes = []
+# ===========================================================================
+# JSON API — used by the static frontend
+# ===========================================================================
 
-    # Internet entry point
-    if assessment.context.internet_exposed:
-        nodes.append({
-            "type": "internet",
-            "icon": "&#127760;",
-            "label": "Internet",
-            "threat_count": 0,
-            "max_level": "",
-        })
+@app.route("/api/assess", methods=["POST"])
+def api_assess():
+    """JSON API endpoint: receives AssessmentInput, returns AssessmentResult."""
+    data = request.get_json(silent=True)
+    if not data or "assessment_data" not in data:
+        return jsonify({"error": "assessment_data is required"}), 400
 
-    # Component type display order
-    type_order = ["frontend", "api", "database", "files_storage", "queue_messaging", "external_system"]
-    icons = {
-        "frontend": "&#9741;",
-        "api": "&#8644;",
-        "database": "&#9707;",
-        "files_storage": "&#9776;",
-        "queue_messaging": "&#8651;",
-        "external_system": "&#9729;",
-    }
-    labels = {
-        "frontend": "Frontend",
-        "api": "API",
-        "database": "Database",
-        "files_storage": "Files / Storage",
-        "queue_messaging": "Queue / Messaging",
-        "external_system": "External System",
-    }
+    assessment_data = data["assessment_data"]
 
-    for comp_type in type_order:
-        if assessment.has_component(comp_type):
-            # Count threats and find max level for this component
-            comp_findings = [f for f in findings if f["component"] == comp_type]
-            threat_count = len(comp_findings)
-            max_level = ""
-            if comp_findings:
-                level_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-                max_level = max(comp_findings, key=lambda f: level_order.get(f["risk"]["level"], 0))["risk"]["level"]
+    # Validate
+    errors = validate_assessment_input(assessment_data)
+    if errors:
+        return jsonify({"error": "validation_error", "details": errors}), 400
 
-            nodes.append({
-                "type": comp_type,
-                "icon": icons.get(comp_type, ""),
-                "label": labels.get(comp_type, comp_type),
-                "threat_count": threat_count,
-                "max_level": max_level,
-            })
+    # Run pipeline
+    try:
+        result = run_analysis(assessment_data, THREAT_RULES, AWS_CONTROLS)
+        serialized = result_to_dict(result)
+    except Exception as e:
+        return jsonify({"error": "processing_error", "message": str(e)}), 500
 
-    return nodes
+    return jsonify({
+        "assessment_id": str(uuid.uuid4()),
+        "result": serialized,
+    })
+
+
+# ===========================================================================
+# Serve static frontend
+# ===========================================================================
+
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "frontend")
+
+
+@app.route("/app/")
+@app.route("/app/<path:filename>")
+def serve_frontend(filename="index.html"):
+    """Serve the static frontend from frontend/ directory."""
+    return send_from_directory(FRONTEND_DIR, filename)
 
 
 if __name__ == "__main__":

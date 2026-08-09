@@ -20,7 +20,9 @@ def load_rules(filepath: str = None) -> List[Dict[str, Any]]:
     Raises ValueError if any rule is invalid.
     """
     if filepath is None:
-        filepath = os.path.join(os.path.dirname(__file__), "..", "data", "threat_rules.json")
+        data_dir = os.environ.get("DATA_DIR",
+                                  os.path.join(os.path.dirname(__file__), "..", "..", "data"))
+        filepath = os.path.join(data_dir, "threat_rules.json")
 
     with open(filepath, "r", encoding="utf-8") as f:
         rules = json.load(f)
@@ -74,6 +76,25 @@ def evaluate_threats(assessment: Assessment, rules: List[Dict[str, Any]]) -> Lis
 
     for rule in rules:
         target_component = rule["component"]
+
+        # Special case: _general rules apply if any component exists (solution-level)
+        if target_component == "_general":
+            if matches_conditions(assessment, rule["conditions"]):
+                evidence = build_evidence(assessment, rule["conditions"])
+                finding = {
+                    "rule_id": rule["id"],
+                    "title": rule["title"],
+                    "component": "general",
+                    "stride": rule["stride"],
+                    "description": rule["description"],
+                    "evidence": evidence,
+                    "base_likelihood": rule["base_likelihood"],
+                    "base_impact": rule["base_impact"],
+                    "control_id": rule["control_id"],
+                    "reference": rule.get("reference", ""),
+                }
+                findings.append(finding)
+            continue
 
         # Skip if the target component is not part of the assessment
         if not assessment.has_component(target_component):

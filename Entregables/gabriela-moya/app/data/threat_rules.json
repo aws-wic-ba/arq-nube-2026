@@ -174,5 +174,49 @@
     "description": "Credenciales de integración que no se gestionan mediante un mecanismo centralizado (vault, secrets manager) pueden quedar en código, variables de entorno expuestas o archivos de configuración, facilitando su filtración.",
     "control_id": "SEC-SEC-01",
     "reference": "AWS Well-Architected Security Pillar - SEC 2; OWASP Secrets Management"
+  },
+  {
+    "id": "THR-GEN-001",
+    "title": "Acciones sin trazabilidad",
+    "component": "_general",
+    "conditions": {
+      "general_controls.has_audit_trail": false
+    },
+    "stride": "Repudiation",
+    "base_likelihood": 3,
+    "base_impact": 3,
+    "description": "Si las acciones administrativas o relevantes no quedan trazadas, resulta difícil atribuir acciones, investigar incidentes o cumplir requisitos de auditoría.",
+    "control_id": "SEC-LOG-01",
+    "reference": "OWASP Logging Cheat Sheet; AWS Well-Architected Security Pillar - SEC 4"
+  },
+  {
+    "id": "THR-FE-001",
+    "title": "Frontend público sin HTTPS",
+    "component": "frontend",
+    "conditions": {
+      "frontend.internet_exposed": true,
+      "frontend.has_encryption_in_transit": false
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 4,
+    "base_impact": 4,
+    "description": "Un frontend público sin HTTPS expone datos de usuario en tránsito (credenciales, tokens, información personal) a interceptación por terceros.",
+    "control_id": "SEC-TLS-01",
+    "reference": "NIST SP 800-52 Rev.2; OWASP Transport Layer Security Cheat Sheet"
+  },
+  {
+    "id": "THR-MSG-001",
+    "title": "Mensajería sensible sin cifrado",
+    "component": "queue_messaging",
+    "conditions": {
+      "queue_messaging.handles_sensitive_data": true,
+      "queue_messaging.has_encryption_in_transit": false
+    },
+    "stride": "Information Disclosure",
+    "base_likelihood": 3,
+    "base_impact": 4,
+    "description": "Mensajes con datos sensibles que se transportan sin cifrado pueden ser leídos por actores con acceso a la red o al broker de mensajes.",
+    "control_id": "SEC-DATA-03",
+    "reference": "AWS Well-Architected Security Pillar - SEC 9"
   }
 ]

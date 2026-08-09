@@ -92,6 +92,10 @@ def parse_session_to_assessment(session_data: dict) -> Assessment:
     """
     Convert session['assessment'] dict into a typed Assessment model.
 
+    This handles the Flask session format where:
+    - components is a list of type strings
+    - properties is a separate dict keyed by component type
+
     Raises ValueError if required data is missing.
     """
     if not session_data:
@@ -138,3 +142,60 @@ def parse_session_to_assessment(session_data: dict) -> Assessment:
         components=components,
         general_controls=general_controls,
     )
+
+
+def assessment_from_dict(data: dict) -> Assessment:
+    """
+    Convert a canonical Assessment dict (from dataclasses.asdict) into an Assessment.
+
+    This handles the normalized format where components is a list of dicts
+    with 'component_type' and 'properties' fields embedded.
+
+    This is the canonical conversion for Lambda adapters and any non-Flask consumer.
+    """
+    if not data:
+        raise ValueError("Assessment data is empty.")
+
+    ctx_data = data.get("context")
+    if not ctx_data:
+        raise ValueError("Assessment context is missing.")
+
+    context = AssessmentContext(
+        solution_name=ctx_data.get("solution_name", ""),
+        description=ctx_data.get("description", ""),
+        solution_type=ctx_data.get("solution_type", ""),
+        criticality=ctx_data.get("criticality", "medium"),
+        internet_exposed=ctx_data.get("internet_exposed", False),
+        external_users=ctx_data.get("external_users", False),
+        sensitive_data=ctx_data.get("sensitive_data", False),
+        third_party=ctx_data.get("third_party", False),
+    )
+
+    components = []
+    for comp_data in data.get("components", []):
+        components.append(ComponentProperties(
+            component_type=comp_data.get("component_type", ""),
+            properties=comp_data.get("properties", {}),
+        ))
+
+    gc_data = data.get("general_controls", {})
+    general_controls = GeneralControls(
+        has_security_logs=gc_data.get("has_security_logs", False),
+        has_audit_trail=gc_data.get("has_audit_trail", False),
+        has_shared_credentials=gc_data.get("has_shared_credentials", False),
+        has_least_privilege=gc_data.get("has_least_privilege", False),
+        has_rto=gc_data.get("has_rto", False),
+        has_rpo=gc_data.get("has_rpo", False),
+    )
+
+    return Assessment(
+        context=context,
+        components=components,
+        general_controls=general_controls,
+    )
+
+
+def assessment_to_dict(assessment: Assessment) -> dict:
+    """Convert an Assessment dataclass to a canonical plain dict."""
+    import dataclasses
+    return dataclasses.asdict(assessment)

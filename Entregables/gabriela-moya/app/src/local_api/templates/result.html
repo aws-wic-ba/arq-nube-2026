@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Resultados — {{ assessment.context.solution_name }} | Secure Design Advisor{% endblock %}
+
+{% block content %}
+<!-- A. Executive Summary + Gate -->
+<div class="card mb-4 border-{{ gate.css_class }}">
+    <div class="card-header bg-{{ gate.css_class }} {{ 'text-white' if gate.css_class != 'warning' else 'text-dark' }}">
+        <strong>Security Architecture Gate</strong>
+    </div>
+    <div class="card-body">
+        <h1 class="h3 text-{{ gate.css_class }}">{{ gate.decision }}</h1>
+        <p class="mb-2">{{ gate.reason }}</p>
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="mb-0">
+                    <dt>Solución</dt><dd>{{ assessment.context.solution_name }}</dd>
+                    <dt>Criticidad</dt>
+                    <dd><span class="badge bg-{{ 'danger' if assessment.context.criticality == 'critical' else 'warning text-dark' if assessment.context.criticality == 'high' else 'info text-dark' if assessment.context.criticality == 'medium' else 'secondary' }}">{{ assessment.context.criticality | upper }}</span></dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="mb-0">
+                    <dt>Riesgo general</dt>
+                    <dd><span class="badge bg-{{ 'danger' if overall_risk == 'critical' else 'warning text-dark' if overall_risk == 'high' else 'info text-dark' if overall_risk == 'medium' else 'success' if overall_risk == 'none' else 'secondary' }}">{{ overall_risk | upper if overall_risk != 'none' else 'SIN RIESGOS' }}</span></dd>
+                    <dt>Amenazas</dt><dd class="fs-5 fw-bold">{{ findings | length }}</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="alert alert-{{ gate.css_class }} mt-3 mb-0">
+            <strong>Próximo paso:</strong> {{ gate.next_action }}
+        </div>
+    </div>
+</div>
+
+<!-- B. Architecture -->
+<div class="card mb-4">
+    <div class="card-header"><strong>Arquitectura</strong></div>
+    <div class="card-body">
+        <div class="architecture-viz">
+            {% for node in viz_nodes %}
+            <div class="viz-node viz-{{ node.type }}">
+                <span class="node-icon">{{ node.icon | safe }}</span>
+                <span class="node-label">{{ node.label }}</span>
+                {% if node.threat_count > 0 %}
+                <span class="threat-badge badge bg-{{ 'danger' if node.max_level == 'critical' else 'warning text-dark' if node.max_level == 'high' else 'info' }}">⚠ {{ node.threat_count }}</span>
+                {% endif %}
+            </div>
+            {% if not loop.last %}<div class="viz-connector">↓</div>{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- C. Threats -->
+<div class="card mb-4">
+    <div class="card-header"><strong>Threat Modeling — Findings STRIDE</strong></div>
+    <div class="card-body p-0">
+        {% if findings %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light"><tr><th>Componente</th><th>STRIDE</th><th>Amenaza</th><th>L</th><th>I</th><th>Score</th><th>Nivel</th></tr></thead>
+                <tbody>
+                {% for f in findings %}
+                <tr>
+                    <td><strong>{{ f.component }}</strong></td>
+                    <td><span class="badge bg-dark">{{ f.stride }}</span></td>
+                    <td><strong>{{ f.title }}</strong><br><small class="text-muted">{{ f.description }}</small>{% if f.evidence %}<br><small class="fst-italic text-secondary">{{ f.evidence | join(" · ") }}</small>{% endif %}</td>
+                    <td>{{ f.risk.final_likelihood }}</td>
+                    <td>{{ f.risk.final_impact }}</td>
+                    <td><strong>{{ f.risk.score }}</strong></td>
+                    <td>{% set lvl = f.risk.level %}<span class="badge bg-{{ 'danger' if lvl == 'critical' else 'warning text-dark' if lvl == 'high' else 'info text-dark' if lvl == 'medium' else 'secondary' }}">{{ lvl | upper }}</span></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">No se identificaron amenazas.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- D. STRIDE Overview -->
+<div class="card mb-4">
+    <div class="card-header"><strong>STRIDE Overview</strong></div>
+    <div class="card-body">
+        <div class="row text-center">
+            {% for cat, count in stride_summary.items() %}
+            <div class="col-4 col-md-2 mb-2">
+                <div class="p-2 rounded {{ 'bg-warning bg-opacity-25' if count > 0 else 'bg-light' }}">
+                    <div class="fw-bold fs-5">{{ count }}</div>
+                    <small class="fw-semibold">{{ cat[0] }}</small>
+                </div>
+                <small class="text-muted" style="font-size:0.7rem">{{ cat }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- E. Zero Trust -->
+<div class="card mb-4">
+    <div class="card-header"><strong>Zero Trust — Alineamiento preliminar</strong></div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4 text-center">
+                <div class="fs-2 fw-bold">{{ zt_report.overall_percentage }}%</div>
+                <small class="text-muted">{{ zt_report.overall_label }}</small>
+            </div>
+            <div class="col-md-8">
+                <div class="progress" style="height:20px" role="progressbar">
+                    <div class="progress-bar bg-{{ 'success' if zt_report.overall_percentage >= 80 else 'warning' if zt_report.overall_percentage >= 50 else 'danger' }}" style="width: {{ zt_report.overall_percentage }}%">{{ zt_report.overall_percentage }}%</div>
+                </div>
+            </div>
+        </div>
+        {% for dim in zt_report.dimensions %}
+        <div class="mb-3 p-2 border rounded">
+            <div class="d-flex justify-content-between align-items-center">
+                <strong>{{ dim.name }}</strong>
+                {% set align = dim.alignment %}
+                <span class="badge bg-{{ 'success' if align == 'cumple' else 'warning text-dark' if align == 'parcial' else 'danger' }}">{{ align | upper }}</span>
+            </div>
+            {% for check in dim.checks %}
+            <small class="d-block text-muted ms-2">{{ '✓' if check.status == 'cumple' else '△' if check.status == 'parcial' else '✗' }} {{ check.description }} — <em>{{ check.evidence }}</em></small>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="alert alert-secondary mt-3 mb-0"><small>Esta evaluación representa un <strong>alineamiento preliminar</strong> y no constituye una certificación Zero Trust.</small></div>
+    </div>
+</div>
+
+<!-- F. Recommendations -->
+<div class="card mb-4">
+    <div class="card-header"><strong>Security Requirements & AWS Recommendations</strong></div>
+    <div class="card-body">
+        {% if recommendations %}
+        {% for rec in recommendations %}
+        <div class="mb-4 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="mb-0">{{ rec.control }}</h6>
+                <span class="badge bg-{{ 'danger' if rec.max_risk_level == 'critical' else 'warning text-dark' if rec.max_risk_level == 'high' else 'info text-dark' if rec.max_risk_level == 'medium' else 'secondary' }}">{{ rec.max_risk_level | upper }}</span>
+            </div>
+            <p class="mb-1"><strong>Requisito:</strong> {{ rec.requirement }}</p>
+            <p class="mb-1"><strong>AWS:</strong> {{ rec.aws_services | join(", ") }}</p>
+            <p class="mb-1 text-muted"><small><strong>Por qué:</strong> {{ rec.explanation }}</small></p>
+            <div class="mt-2">
+                <small class="text-secondary">Amenazas relacionadas:</small>
+                {% for rf in rec.related_findings %}
+                <span class="badge bg-light text-dark border me-1">{{ rf.component }} · {{ rf.stride }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-muted">No se generaron recomendaciones.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="text-center mt-4 mb-3">
+    <a href="{{ url_for('step_review') }}" class="btn btn-outline-secondary me-2">&larr; Volver a revisión</a>
+    <a href="{{ url_for('new_assessment') }}" class="btn btn-outline-primary">Nueva evaluación</a>
+</div>
+{% endblock %}

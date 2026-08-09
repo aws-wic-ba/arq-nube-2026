@@ -1,0 +1,287 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Secure Design Advisor — Serverless Architecture
+  CloudFront → S3 frontend + API Gateway → Step Functions Express → Lambda → DynamoDB
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 30
+    MemorySize: 256
+    Layers:
+      - !Ref EngineLayer
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, prod]
+
+Resources:
+  # ===========================================================================
+  # SHARED LAYER — engine/ + data/
+  # ===========================================================================
+  #
+  # Layer structure after packaging:
+  #   /opt/python/engine/         ← auto-added to PYTHONPATH by Lambda runtime
+  #   /opt/python/engine/models.py
+  #   /opt/python/engine/rules.py
+  #   /opt/python/engine/risk.py
+  #   /opt/python/engine/zero_trust.py
+  #   /opt/python/engine/recommendations.py
+  #   /opt/python/engine/gate.py
+  #   /opt/python/engine/pipeline.py
+  #   /opt/python/engine/visualization.py
+  #   /opt/python/engine/result_builder.py
+  #   /opt/python/engine/contracts.py
+  #   /opt/python/engine/exceptions.py
+  #   /opt/data/                  ← rule catalogs (accessed via DATA_DIR env var)
+  #   /opt/data/threat_rules.json
+  #   /opt/data/aws_controls.json
+  #   /opt/data/zero_trust_rules.json
+  #
+  # Build: SAM packages layer_content/ directory where:
+  #   layer_content/python/engine/ = src/engine/
+  #   layer_content/data/ = data/
+  #
+  EngineLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "sda-engine-${Stage}"
+      Description: "Shared Threat Modeling engine and rule catalogs"
+      ContentUri: ../layer_content/
+      CompatibleRuntimes:
+        - python3.11
+
+  # ===========================================================================
+  # LAMBDA FUNCTIONS
+  # ===========================================================================
+  #
+  # Each Lambda's code lives in lambdas/<name>/.
+  # Handler path: handler.handler (module.function within CodeUri)
+  # Engine is available from Layer at /opt/python/engine/
+  # Data catalogs at /opt/data/ (via DATA_DIR environment variable)
+  #
+  ValidateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "sda-validate-${Stage}"
+      Handler: handler.handler
+      CodeUri: ../lambdas/validate/
+      Description: "Validates and normalizes assessment input"
+      Environment:
+        Variables:
+          DATA_DIR: /opt/data
+      Policies: []
+
+  ThreatAnalysisFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "sda-threat-analysis-${Stage}"
+      Handler: handler.handler
+      CodeUri: ../lambdas/threat_analysis/
+      Description: "STRIDE threat rule matching"
+      Environment:
+        Variables:
+          DATA_DIR: /opt/data
+      Policies: []
+
+  RiskEvaluationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "sda-risk-evaluation-${Stage}"
+      Handler: handler.handler
+      CodeUri: ../lambdas/risk_evaluation/
+      Description: "Risk scoring + Zero Trust + Gate + Recommendations"
+      Environment:
+        Variables:
+          DATA_DIR: /opt/data
+      Policies: []
+
+  BuildResultFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "sda-build-result-${Stage}"
+      Handler: handler.handler
+      CodeUri: ../lambdas/build_result/
+      Description: "Assembles canonical AssessmentResult"
+      Environment:
+        Variables:
+          DATA_DIR: /opt/data
+      Policies: []
+
+  # ===========================================================================
+  # DYNAMODB
+  # ===========================================================================
+  AssessmentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "sda-assessments-${Stage}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: assessment_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: assessment_id
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  # ===========================================================================
+  # STEP FUNCTIONS — Express Workflow (Synchronous)
+  # ===========================================================================
+  AssessmentWorkflow:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub "sda-assessment-workflow-${Stage}"
+      Type: EXPRESS
+      DefinitionUri: step-functions/assessment-workflow.asl.json
+      DefinitionSubstitutions:
+        ValidateFunctionArn: !GetAtt ValidateFunction.Arn
+        ThreatAnalysisFunctionArn: !GetAtt ThreatAnalysisFunction.Arn
+        RiskEvaluationFunctionArn: !GetAtt RiskEvaluationFunction.Arn
+        BuildResultFunctionArn: !GetAtt BuildResultFunction.Arn
+        AssessmentsTableName: !Ref AssessmentsTable
+      Logging:
+        Level: ALL
+        IncludeExecutionData: true
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt WorkflowLogGroup.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ValidateFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ThreatAnalysisFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref RiskEvaluationFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref BuildResultFunction
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AssessmentsTable
+        - CloudWatchLogsFullAccess
+
+  WorkflowLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/stepfunctions/sda-assessment-workflow-${Stage}"
+      RetentionInDays: 14
+
+  # ===========================================================================
+  # API GATEWAY
+  # ===========================================================================
+  AssessmentApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "sda-api-${Stage}"
+      StageName: !Ref Stage
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: api/openapi.yaml
+
+  ApiGatewayStepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "sda-apigw-sfn-role-${Stage}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeStepFunctions
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: states:StartSyncExecution
+                Resource: !GetAtt AssessmentWorkflow.Arn
+
+  # ===========================================================================
+  # FRONTEND — S3 + CloudFront
+  # ===========================================================================
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "sda-frontend-${Stage}-${AWS::AccountId}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "sda-oac-${Stage}"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: S3Frontend
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt CloudFrontOAC.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+          - Id: ApiGateway
+            DomainName: !Sub "${AssessmentApi}.execute-api.${AWS::Region}.amazonaws.com"
+            OriginPath: !Sub "/${Stage}"
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+        DefaultCacheBehavior:
+          TargetOriginId: S3Frontend
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+        CacheBehaviors:
+          - PathPattern: "/api/*"
+            TargetOriginId: ApiGateway
+            ViewerProtocolPolicy: https-only
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+
+Outputs:
+  FrontendUrl:
+    Description: "CloudFront URL for the frontend"
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+  ApiUrl:
+    Description: "API Gateway direct endpoint (bypasses CloudFront)"
+    Value: !Sub "https://${AssessmentApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/api/assess"
+  WorkflowArn:
+    Description: "Step Functions State Machine ARN"
+    Value: !GetAtt AssessmentWorkflow.Arn
+  TableName:
+    Description: "DynamoDB assessments table"
+    Value: !Ref AssessmentsTable

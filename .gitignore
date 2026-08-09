@@ -1,0 +1,21 @@
+# Kiro (local development tooling)
+.kiro/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Test caches
+.pytest_cache/
+
+# Environment variables
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
