@@ -1,0 +1,51 @@
+
+
+services:
+  # 1. Base de Datos PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: travel-agency-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: travel_agency
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d travel_agency"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Backend (Node.js API)
+  backend:
+    build:
+      context: ./travel-agency-backend
+      dockerfile: Dockerfile
+    container_name: travel-agency-api
+    restart: always
+    env_file:
+      - ./travel-agency-backend/.env
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. Frontend (Vite / React)
+  frontend:
+    build:
+      context: ./travel-agency-frontend
+      dockerfile: Dockerfile
+    container_name: travel-agency-web
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
