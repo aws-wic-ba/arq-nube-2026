@@ -210,12 +210,10 @@ Evolucionar a warm standby o active-active multiplicaría el costo base (estimad
 
 | Limitación | Impacto |
 |-----------|---------|
-| Arquitectura no desplegada en AWS | Runbook no probado, RTO/RPO no medidos |
 | PITR restore no ejecutado | Proceso no validado en práctica |
 | Single-region | Falla regional requiere recuperación manual |
 | Sin alarmas automatizadas | Detección depende de revisión humana |
 | Sin test periódico de recovery | No hay evidencia de que el RTO target sea alcanzable |
-| sam deploy no ejecutado | No confirmado que IaC reproduce el stack correctamente |
 
 ## Conclusión
 

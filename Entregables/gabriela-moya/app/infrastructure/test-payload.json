@@ -1,0 +1,26 @@
+{
+  "assessment_data": {
+    "context": {
+      "solution_name": "Deploy Verification Test",
+      "description": "Minimal payload for deployment validation",
+      "solution_type": "web_application",
+      "criticality": "medium",
+      "internet_exposed": true,
+      "external_users": true,
+      "sensitive_data": true,
+      "third_party": false
+    },
+    "components": ["frontend", "api", "database"],
+    "properties": {
+      "frontend": { "authentication": true, "https": true },
+      "api": { "authentication": true, "rate_limiting": true, "input_validation": true },
+      "database": { "encryption_at_rest": true, "encryption_in_transit": true, "access_control": true }
+    },
+    "general_controls": {
+      "logging": true,
+      "monitoring": true,
+      "secrets_management": true,
+      "iac": true
+    }
+  }
+}

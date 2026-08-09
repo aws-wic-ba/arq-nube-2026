@@ -10,11 +10,11 @@ La aplicación genera evaluaciones de seguridad sobre arquitecturas de terceros 
 
 | Pilar | Estado | Fortaleza principal | Gap principal |
 |-------|--------|--------------------|----|
-| Operational Excellence | 🟡 Parcial | Infraestructura como código y workflow explícito | Sin deployment real ni automatización de despliegue |
+| Operational Excellence | 🟡 Parcial | IaC desplegado y script de deploy automatizado | Sin pipeline CI/CD ni alarmas |
 | Security | 🟡 Parcial | Mínimo privilegio y acceso privado a S3 | Sin autenticación de usuarios ni protección de API |
-| Reliability | 🟡 Parcial | Servicios administrados y manejo de errores | Sin pruebas E2E en AWS ni multi-región |
-| Performance Efficiency | ✅ Alineado | Serverless ajustado a un workload corto | Sin métricas reales de latencia |
-| Cost Optimization | ✅ Alineado | Pago por uso completo, sin recursos ociosos | Costos aún por estimar formalmente |
+| Reliability | 🟡 Parcial | Servicios administrados y manejo de errores verificado E2E | Sin multi-región ni chaos testing |
+| Performance Efficiency | ✅ Alineado | Serverless ajustado a un workload corto | Sin métricas sistemáticas de latencia |
+| Cost Optimization | ✅ Alineado | Pago por uso completo, sin recursos ociosos | — |
 | Sustainability | ✅ Alineado | Recursos bajo demanda que escalan a cero | Sin medición de utilización |
 
 ---
@@ -23,11 +23,11 @@ La aplicación genera evaluaciones de seguridad sobre arquitecturas de terceros 
 
 ### Lo que ya se resuelve bien
 
-La infraestructura completa está definida como código en un template SAM con 15 recursos. El workflow de análisis está documentado paso a paso en ASL, incluyendo sus entradas, salidas y caminos de error. El motor de dominio se prueba de forma independiente al runtime con 159 tests automatizados. Los logs del Express Workflow están configurados con nivel ALL para capturar cada transición de estado. El script `prepare_layer.py` permite reproducir artefactos de forma determinista.
+La infraestructura completa está definida como código en un template SAM con 15 recursos y desplegada exitosamente en us-east-1. El workflow de análisis está documentado paso a paso en ASL, incluyendo sus entradas, salidas y caminos de error. El motor de dominio se prueba de forma independiente al runtime con 159 tests automatizados. Los logs del Express Workflow están configurados con nivel ALL para capturar cada transición de estado. El script `prepare_layer.py` permite reproducir artefactos de forma determinista. Un script `deploy.sh` automatiza el ciclo completo de deployment.
 
 ### Lo que falta
 
-No existe un pipeline de CI/CD, por lo que el deployment depende de ejecución manual. Las herramientas `sam build` y `sam validate` no se han ejecutado porque requieren SAM CLI. No hay alarmas configuradas en CloudWatch — únicamente logs. Tampoco existen runbooks ni dashboards operacionales.
+No existe un pipeline de CI/CD, por lo que el deployment depende de ejecución manual (script `deploy.sh`). No hay alarmas configuradas en CloudWatch — únicamente logs. Tampoco existen runbooks ni dashboards operacionales.
 
 ### Qué mejoraría con más tiempo
 
@@ -68,7 +68,7 @@ Toda la arquitectura utiliza servicios administrados sin servidores individuales
 
 ### Lo que falta
 
-No se ha ejecutado la arquitectura en AWS, por lo que no existen pruebas de fallo reales. La solución opera en una sola región. No hay chaos testing ni health checks externos. El detalle de recuperación ante desastres se desarrolla en [docs/06-disaster-recovery.md](./06-disaster-recovery.md).
+La solución opera en una sola región. No hay chaos testing ni health checks externos. El detalle de recuperación ante desastres se desarrolla en [docs/06-disaster-recovery.md](./06-disaster-recovery.md).
 
 ---
 
@@ -95,7 +95,7 @@ Se tomaron decisiones deliberadas para evitar complejidad sin beneficio:
 
 ### Lo que falta
 
-No existen métricas reales de latencia porque la arquitectura no fue desplegada. Cold starts, tiempos de respuesta de DynamoDB y concurrencia requieren medición en un ambiente real.
+Cold starts y tiempos de respuesta de DynamoDB requieren medición sistemática más allá de la verificación E2E inicial.
 
 ---
 
@@ -157,14 +157,14 @@ La arquitectura es consistente con las prácticas recomendadas por la Serverless
 
 | ID | Pilar | Hallazgo | Estado | Riesgo |
 |----|-------|----------|--------|--------|
-| WA-OE-01 | Op. Excellence | Infraestructura completa como código | ✅ Definido | — |
-| WA-OE-02 | Op. Excellence | Sin pipeline CI/CD ni automatización de deployment | 🟡 Gap | Medio |
+| WA-OE-01 | Op. Excellence | Infraestructura completa como código, desplegada | ✅ Implementado | — |
+| WA-OE-02 | Op. Excellence | Sin pipeline CI/CD (deploy manual via script) | 🟡 Gap | Bajo |
 | WA-OE-03 | Op. Excellence | Sin alarmas configuradas | 🟡 Gap | Medio |
 | WA-SEC-01 | Security | IAM con mínimo privilegio | ✅ Definido | — |
 | WA-SEC-02 | Security | Sin autenticación de usuarios en la API | 🟡 Gap | Alto si se expone / Bajo para MVP |
 | WA-SEC-03 | Security | Sin WAF ni rate limiting | 🟡 Gap | Medio si se expone |
 | WA-SEC-04 | Security | Cifrado at rest con claves AWS default | ✅ Suficiente | Bajo |
-| WA-REL-01 | Reliability | Error paths y retries configurados en el workflow | ✅ Definido | — |
+| WA-REL-01 | Reliability | Error paths y retries configurados en el workflow | ✅ Verificado en producción | — |
 | WA-REL-02 | Reliability | Operación single-region | 🟡 Limitación | Medio |
 | WA-REL-03 | Reliability | DynamoDB PITR habilitado | ✅ Definido | — |
 | WA-PERF-01 | Performance | Arquitectura adecuada al workload | ✅ Alineado | — |
@@ -188,8 +188,7 @@ La arquitectura es consistente con las prácticas recomendadas por la Serverless
 
 ### Antes de producción
 - Implementar autenticación de usuarios.
-- Ejecutar `sam validate` y deployment en entorno de desarrollo.
-- Realizar pruebas end-to-end en AWS.
+- Realizar pruebas de carga y stress testing.
 
 ### Hardening
 - WAF con rate-based rules según nivel de exposición.
@@ -209,7 +208,7 @@ La arquitectura es consistente con las prácticas recomendadas por la Serverless
 
 | # | Riesgo | Mitigación actual | Residual |
 |---|--------|-------------------|----------|
-| 1 | Arquitectura no desplegada — integraciones AWS no validadas | IaC + tests estáticos + equivalencia demostrada | Medio |
+| 1 | Arquitectura no desplegada — integraciones AWS no validadas | IaC + tests estáticos + equivalencia demostrada + **deployment exitoso** | Bajo (mitigado) |
 | 2 | API pública sin autenticación | Aceptable para MVP académico sin exposición real | Alto si se expone |
 | 3 | Operación en una sola región | Servicios administrados reducen impacto parcial | Medio |
 | 4 | Observabilidad limitada a logs sin alarmas | Logs definidos; alarmas como siguiente paso | Medio |

@@ -1,5 +1,9 @@
 # 03 — Arquitectura AWS
 
+## Diagrama de componentes cloud
+
+![Arquitectura AWS — Secure Design Advisor](../diagrams/arquitectura-aws.png)
+
 ## Visión general
 
 Secure Design Advisor evoluciona desde una ejecución local basada en un pipeline Python hacia una **arquitectura serverless orientada a workflow** en AWS.
@@ -333,12 +337,12 @@ Todos los servicios son gestionados y escalan automáticamente:
 
 | Componente | Estado |
 |-----------|--------|
-| SAM template (15 recursos) | ✅ Definido, validado estáticamente |
-| ASL State Machine (13 estados) | ✅ Definida, testeada |
-| OpenAPI spec | ✅ Definida, validada |
-| Lambda handlers (4) | ✅ Implementados, testeados |
+| SAM template (15 recursos) | ✅ Definido, validado y desplegado |
+| ASL State Machine (13 estados) | ✅ Definida, testeada, desplegada |
+| OpenAPI spec | ✅ Definida, integrada inline en template |
+| Lambda handlers (4) | ✅ Implementados, testeados, desplegados |
 | prepare_layer.py | ✅ Funcional |
-| `sam build` / `sam validate` | ⏳ Requiere SAM CLI |
-| Deployment AWS | ❌ No requerido por el curso |
-| VTL response mapping runtime | ⏳ Requiere deployment |
-| CloudFront live | ⏳ Requiere deployment |
+| `sam build` / `sam validate` | ✅ Ejecutados correctamente |
+| Deployment AWS | ✅ Stack sda-dev en us-east-1 |
+| VTL response mapping runtime | ✅ Funcionando (verificado E2E) |
+| CloudFront live | ✅ https://dvotsq485mjh9.cloudfront.net |

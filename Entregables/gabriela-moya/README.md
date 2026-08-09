@@ -32,13 +32,23 @@ Docker → Flask (thin API adapter) → engine/ → JSON response
 
 Un frontend estático (HTML/CSS/JS) se comunica con un endpoint `POST /api/assess` que invoca el pipeline completo del engine y retorna el resultado como JSON.
 
-### Arquitectura AWS (definida en IaC, no desplegada)
+### Arquitectura AWS (desplegada)
 
 ```
 CloudFront → S3 (frontend) + API Gateway → Step Functions Express → 4 Lambda adapters → DynamoDB
 ```
 
 Las Lambda adapters reutilizan el mismo engine. Step Functions orquesta el workflow de análisis. La persistencia se maneja por integración directa con DynamoDB (las Lambdas no escriben a la base).
+
+**Entorno desplegado (dev):**
+
+| Recurso | URL / Identificador |
+|---------|---------------------|
+| Frontend | https://dvotsq485mjh9.cloudfront.net |
+| API | https://qhunubdni4.execute-api.us-east-1.amazonaws.com/dev/api/assess |
+| State Machine | sda-assessment-workflow-dev |
+| DynamoDB | sda-assessments-dev |
+| Stack CloudFormation | sda-dev (us-east-1) |
 
 ## Ejecución local
 
@@ -76,8 +86,14 @@ app/
 ├── data/                   # Catálogos de reglas (JSON)
 ├── frontend/               # Frontend estático (HTML/CSS/JS + Bootstrap)
 ├── lambdas/                # Lambda adapters (4 handlers)
-├── infrastructure/         # IaC: SAM template, ASL, OpenAPI
+├── infrastructure/         # IaC: SAM template, ASL, OpenAPI, samconfig
+│   ├── template.yaml       # SAM template (CloudFormation)
+│   ├── samconfig.toml      # Configuración de despliegue
+│   ├── test-payload.json   # Payload de verificación E2E
+│   ├── step-functions/     # ASL workflow definition
+│   └── api/                # OpenAPI spec (referencia)
 ├── tests/                  # Unit + contract + infrastructure tests
+├── deploy.sh              # Script de despliegue automatizado
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
@@ -94,16 +110,45 @@ app/
 | [05-costos.md](docs/05-costos.md) | Estimación de costos por escenario con precios oficiales |
 | [06-disaster-recovery.md](docs/06-disaster-recovery.md) | Estrategia Backup & Restore, RTO/RPO, runbook propuesto |
 
+## Deployment AWS
+
+Para desplegar la aplicación en AWS (cuenta 359932033910, us-east-1):
+
+```bash
+cd Entregables/gabriela-moya/app
+
+# Deployment completo (prerequisites → layer → build → deploy → frontend → verify)
+./deploy.sh
+
+# Solo validar y construir (sin desplegar)
+./deploy.sh --skip-deploy
+
+# Solo verificar un despliegue existente
+./deploy.sh --verify-only
+
+# Usar contenedor Docker para el build de SAM
+./deploy.sh --use-container
+```
+
+Requisitos previos:
+- AWS CLI v2 configurado con credenciales para la cuenta 359932033910
+- SAM CLI v1.x
+- Python 3.11 o 3.12
+- Región configurada: `aws configure set region us-east-1`
+
+El script ejecuta 6 fases: prerequisites, layer preparation, SAM validate & build, SAM deploy, frontend upload + CloudFront invalidation, y verification end-to-end.
+
 ## Estado del proyecto
 
 | Componente | Estado |
 |-----------|--------|
-| Threat Modeling Engine | Implementado y testeado |
-| Frontend estático | Implementado |
-| Lambda adapters | Implementados y testeados |
-| Infraestructura AWS (IaC) | Definida, validación estática |
-| Docker | Definido, validación manual pendiente |
-| Deployment AWS | No requerido por el curso |
+| Threat Modeling Engine | ✅ Implementado y testeado |
+| Frontend estático | ✅ Implementado |
+| Lambda adapters | ✅ Implementados y testeados |
+| Infraestructura AWS (IaC) | ✅ Definida y desplegada |
+| Docker | ✅ Definido |
+| Deployment AWS | ✅ Desplegado en us-east-1 (stack sda-dev) |
+| Verificación end-to-end | ✅ API respondiendo correctamente |
 
 ## Tecnologías
 
@@ -112,3 +157,7 @@ app/
 - Docker
 - AWS: CloudFront, S3, API Gateway, Step Functions, Lambda, DynamoDB, CloudWatch
 - SAM (Serverless Application Model)
+
+## LinkedIn
+
+[Post sobre el proyecto](https://www.linkedin.com/posts/gmoyamor_securityabrbyabrdesignabrforabrcloudabrarchitects-ugcPost-7492028457498116096-GzBl/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAD_kzIMBBm7ShcVi-AKa6gkJ0rT1uB1Lu84)

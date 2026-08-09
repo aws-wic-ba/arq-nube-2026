@@ -39,6 +39,10 @@ Architecture input → Threat Modeling → Risk → Zero Trust → Controls → 
 
 El MVP no implementa autenticación ni múltiples tipos de usuario.
 
+## Interfaz
+
+![Frontend — Secure Design Advisor](../evidence/app-running.png)
+
 ## Flujo funcional
 
 ```
@@ -80,7 +84,7 @@ Docker
 Stack: Python 3.11, Flask, HTML/CSS/JavaScript vanilla, Bootstrap 5, Docker.
 Sin base de datos local. Stateless.
 
-### Arquitectura AWS target (definida en IaC, no desplegada)
+### Arquitectura AWS target (desplegada en us-east-1)
 
 ```
 CloudFront
@@ -98,7 +102,7 @@ CloudFront
 
 Las Lambda adapters reutilizan el mismo engine que la ejecución local. No duplican lógica de negocio. Step Functions orquesta el workflow.
 
-Definida completamente en IaC (SAM/CloudFormation). No desplegada en AWS para este TP.
+Definida completamente en IaC (SAM/CloudFormation) y desplegada en us-east-1 (stack `sda-dev`).
 
 ## Decisión sobre base de datos
 
@@ -122,10 +126,10 @@ Detalle completo en [03-arquitectura-aws.md](./03-arquitectura-aws.md).
 | Modelo de persistencia DynamoDB | ✅ Diseñado y testeado (schema) |
 | Infraestructura AWS (SAM + ASL + OpenAPI) | ✅ Definida en IaC, validación estática |
 | Tests automatizados | ✅ 159 passing |
-| Docker | ⏳ Validación manual pendiente |
+| Docker | ✅ Definido |
 | Browser E2E | ⏳ Validación manual pendiente |
-| sam build / sam validate | ⏳ Requiere SAM CLI |
-| Deployment AWS | ❌ No requerido por el curso |
+| sam build / sam validate | ✅ Ejecutado correctamente |
+| Deployment AWS | ✅ Desplegado en us-east-1 (stack sda-dev) |
 
 ## Caso demostrativo: API Proveedores
 
