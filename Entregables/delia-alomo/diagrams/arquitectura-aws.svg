@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+    <marker id="arrowhead-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#545B64"/>
+    </marker>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#FFFFFF" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#232F3E">ZeroToTech - Arquitectura AWS (Serverless)</text>
+
+  <!-- User Icon -->
+  <g transform="translate(400, 70)">
+    <circle cx="0" cy="-8" r="10" fill="none" stroke="#232F3E" stroke-width="2"/>
+    <path d="M-12 18 Q0 8 12 18" fill="none" stroke="#232F3E" stroke-width="2"/>
+    <line x1="0" y1="2" x2="0" y2="14" stroke="#232F3E" stroke-width="2"/>
+  </g>
+  <text x="400" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#232F3E">Usuario</text>
+
+  <!-- ==================== LEFT PATH: Static Content ==================== -->
+
+  <!-- Arrow from User to CloudFront -->
+  <line x1="350" y1="105" x2="220" y2="155" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="265" y="125" font-family="Arial, sans-serif" font-size="9" fill="#545B64" text-anchor="middle">static files</text>
+
+  <!-- CloudFront -->
+  <g filter="url(#shadow)">
+    <rect x="130" y="160" width="160" height="50" rx="8" fill="#8C4FFF" opacity="0.12" stroke="#8C4FFF" stroke-width="2"/>
+  </g>
+  <text x="210" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#8C4FFF">Amazon CloudFront</text>
+  <text x="210" y="198" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">CDN - Distribución global</text>
+
+  <!-- Arrow from CloudFront to S3 -->
+  <line x1="210" y1="210" x2="210" y2="265" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="235" y="242" font-family="Arial, sans-serif" font-size="9" fill="#545B64">origin fetch</text>
+
+  <!-- S3 -->
+  <g filter="url(#shadow)">
+    <rect x="130" y="270" width="160" height="50" rx="8" fill="#3F8624" opacity="0.12" stroke="#3F8624" stroke-width="2"/>
+  </g>
+  <text x="210" y="292" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#3F8624">Amazon S3</text>
+  <text x="210" y="308" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Frontend estático (React/Vite)</text>
+
+  <!-- ==================== RIGHT PATH: Backend ==================== -->
+
+  <!-- Arrow from User to Cognito -->
+  <line x1="450" y1="105" x2="560" y2="155" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="525" y="125" font-family="Arial, sans-serif" font-size="9" fill="#545B64" text-anchor="middle">login/signup</text>
+
+  <!-- Backend Serverless dashed box -->
+  <rect x="430" y="140" width="340" height="420" rx="10" fill="none" stroke="#232F3E" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.5"/>
+  <text x="600" y="158" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#232F3E" opacity="0.7">Backend Serverless</text>
+
+  <!-- Cognito -->
+  <g filter="url(#shadow)">
+    <rect x="510" y="165" width="160" height="50" rx="8" fill="#DD344C" opacity="0.12" stroke="#DD344C" stroke-width="2"/>
+  </g>
+  <text x="590" y="187" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#DD344C">Amazon Cognito</text>
+  <text x="590" y="203" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Autenticación / JWT tokens</text>
+
+  <!-- Arrow from Cognito to API Gateway -->
+  <line x1="590" y1="215" x2="590" y2="270" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="620" y="247" font-family="Arial, sans-serif" font-size="9" fill="#545B64">JWT token</text>
+
+  <!-- API Gateway -->
+  <g filter="url(#shadow)">
+    <rect x="510" y="275" width="160" height="50" rx="8" fill="#E7157B" opacity="0.12" stroke="#E7157B" stroke-width="2"/>
+  </g>
+  <text x="590" y="297" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#E7157B">Amazon API Gateway</text>
+  <text x="590" y="313" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Valida token, enruta requests</text>
+
+  <!-- Arrow from API Gateway to Lambda -->
+  <line x1="590" y1="325" x2="590" y2="380" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="620" y="357" font-family="Arial, sans-serif" font-size="9" fill="#545B64">API requests</text>
+
+  <!-- Lambda -->
+  <g filter="url(#shadow)">
+    <rect x="510" y="385" width="160" height="50" rx="8" fill="#ED7100" opacity="0.12" stroke="#ED7100" stroke-width="2"/>
+  </g>
+  <text x="590" y="407" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ED7100">AWS Lambda</text>
+  <text x="590" y="423" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Lógica de negocio</text>
+
+  <!-- Arrow from Lambda to DynamoDB -->
+  <line x1="590" y1="435" x2="590" y2="490" stroke="#545B64" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="625" y="467" font-family="Arial, sans-serif" font-size="9" fill="#545B64">read/write</text>
+
+  <!-- DynamoDB -->
+  <g filter="url(#shadow)">
+    <rect x="510" y="495" width="160" height="50" rx="8" fill="#C925D1" opacity="0.12" stroke="#C925D1" stroke-width="2"/>
+  </g>
+  <text x="590" y="517" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#C925D1">Amazon DynamoDB</text>
+  <text x="590" y="533" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Users &amp; progress data</text>
+
+  <!-- ==================== CloudWatch (Monitoring) ==================== -->
+
+  <!-- CloudWatch -->
+  <g filter="url(#shadow)">
+    <rect x="130" y="390" width="160" height="50" rx="8" fill="#E7157B" opacity="0.12" stroke="#E7157B" stroke-width="2"/>
+  </g>
+  <text x="210" y="412" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#E7157B">Amazon CloudWatch</text>
+  <text x="210" y="428" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Monitoring / Logs / Métricas</text>
+
+  <!-- Arrow from API Gateway to CloudWatch -->
+  <line x1="510" y1="300" x2="295" y2="395" stroke="#545B64" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arrowhead)"/>
+  <text x="370" y="340" font-family="Arial, sans-serif" font-size="9" fill="#545B64" transform="rotate(-15, 370, 340)">logs &amp; metrics</text>
+
+  <!-- Arrow from Lambda to CloudWatch -->
+  <line x1="510" y1="410" x2="295" y2="415" stroke="#545B64" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arrowhead)"/>
+  <text x="395" y="405" font-family="Arial, sans-serif" font-size="9" fill="#545B64">logs &amp; metrics</text>
+
+  <!-- ==================== Legend / Labels ==================== -->
+
+  <!-- Left path label -->
+  <text x="210" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#232F3E" opacity="0.6">Contenido Estático</text>
+
+  <!-- Footer -->
+  <text x="400" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#545B64">Arquitectura Serverless — Alta disponibilidad, escalabilidad automática, pago por uso</text>
+</svg>
