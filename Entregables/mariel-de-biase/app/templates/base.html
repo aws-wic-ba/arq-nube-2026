@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}MamaBank{% endblock %}</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            color: #222;
+        }
+        header {
+            background: #2d6a4f;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header a { color: white; text-decoration: none; }
+        main {
+            max-width: 720px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .pending { background: #fff3cd; color: #856404; }
+        .approved { background: #d4edda; color: #155724; }
+        .rejected { background: #f8d7da; color: #721c24; }
+        label { display: block; margin-top: 12px; font-weight: 600; }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button, .btn {
+            margin-top: 20px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #2d6a4f;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button.reject { background: #b23a48; }
+        .flash {
+            background: #e7f3ff;
+            border-left: 4px solid #2d6a4f;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+        }
+        .balance {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #2d6a4f;
+            margin-bottom: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .metric-box {
+            background: #f4f6f8;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .metric-label { font-size: 0.8em; color: #666; }
+        .metric-value { font-size: 1.4em; font-weight: 700; color: #2d6a4f; }
+
+        .cat-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0;
+        }
+        .cat-label { width: 160px; font-size: 0.9em; }
+        .cat-bar-bg {
+            flex: 1;
+            background: #eee;
+            border-radius: 6px;
+            height: 14px;
+            overflow: hidden;
+        }
+        .cat-bar { background: #2d6a4f; height: 100%; }
+        .cat-pct { width: 40px; text-align: right; font-size: 0.85em; color: #555; }
+
+        .request-block {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .request-info {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .request-thumb {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .request-thumb-sm {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .request-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .inline-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .inline-form label {
+            width: 100%;
+            margin: 0;
+            font-size: 0.8em;
+            font-weight: 500;
+            color: #555;
+        }
+        .inline-form input[type="number"] { width: 110px; margin: 0; }
+        .inline-form input[type="text"] { flex: 1; min-width: 180px; margin: 0; }
+        .inline-form button { margin: 0; }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .tab-btn {
+            margin: 0;
+            background: none;
+            color: #555;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab-btn:hover { background: #eef2ef; }
+        .tab-btn.active {
+            background: #2d6a4f;
+            color: white;
+        }
+        .tab-count {
+            background: #b23a48;
+            color: white;
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 0.75em;
+            margin-left: 4px;
+        }
+
+        .child-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .child-chip {
+            text-decoration: none;
+            background: white;
+            color: #2d6a4f;
+            border: 2px solid #2d6a4f;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .child-chip.active {
+            background: #2d6a4f;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <strong>🏦 MamaBank <small style="font-weight:400; opacity:0.85;">¿Y ahora qué te falta?</small></strong>
+        {% if current_user.is_authenticated %}
+        <span>{{ current_user.name }} · <a href="{{ url_for('logout') }}">Salir</a></span>
+        {% endif %}
+    </header>
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for m in messages %}
+                    <div class="flash">{{ m }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
