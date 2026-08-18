@@ -1,0 +1,10 @@
+services:
+  web:
+    build: .
+    container_name: panel-cuentas
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_PATH=data/panel.db
