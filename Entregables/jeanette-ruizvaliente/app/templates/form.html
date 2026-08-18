@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{% if cliente %}Editar cuenta{% else %}Nueva cuenta{% endif %} — Panel de Cuentas{% endblock %}
+{% block content %}
+
+<section class="form-wrap">
+  <h1>{% if cliente %}Editar cuenta{% else %}Nueva cuenta{% endif %}</h1>
+
+  <form method="POST" class="account-form">
+    <label>
+      Nombre del cliente
+      <input type="text" name="nombre" required value="{{ cliente.nombre if cliente else '' }}" />
+    </label>
+
+    <label>
+      Contacto principal
+      <input type="text" name="contacto" placeholder="Nombre y rol" value="{{ cliente.contacto if cliente else '' }}" />
+    </label>
+
+    <label>
+      Plan contratado
+      <select name="plan">
+        {% for p in ["Starter", "Growth", "Enterprise"] %}
+        <option value="{{ p }}" {% if cliente and cliente.plan == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <div class="form-row">
+      <label>
+        Fecha de renovación
+        <input type="date" name="fecha_renovacion" required value="{{ cliente.fecha_renovacion if cliente else '' }}" />
+      </label>
+      <label>
+        Última interacción
+        <input type="date" name="ultima_interaccion" required value="{{ cliente.ultima_interaccion if cliente else '' }}" />
+      </label>
+    </div>
+
+    <label>
+      Tickets de soporte abiertos
+      <input type="number" name="tickets_abiertos" min="0" value="{{ cliente.tickets_abiertos if cliente else 0 }}" />
+    </label>
+
+    <label>
+      Notas de la cuenta
+      <textarea name="notas" rows="4" placeholder="Contexto comercial, riesgos, próximos pasos">{{ cliente.notas if cliente else '' }}</textarea>
+    </label>
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar cuenta</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

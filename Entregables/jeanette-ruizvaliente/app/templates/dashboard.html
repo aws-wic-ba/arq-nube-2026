@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Panel de Cuentas — Dashboard{% endblock %}
+{% block content %}
+
+<section class="charts">
+  <div class="chart-card">
+    <h3>Evolución diaria <span>últimas mediciones</span></h3>
+    {% if graficos.diario %}{{ graficos.diario|safe }}{% else %}<p class="chart-empty">Todavía no hay suficientes datos.</p>{% endif %}
+  </div>
+  <div class="chart-card">
+    <h3>Promedio mensual <span>salud de la cartera</span></h3>
+    {% if graficos.mensual %}{{ graficos.mensual|safe }}{% else %}<p class="chart-empty">Todavía no hay suficientes datos.</p>{% endif %}
+  </div>
+</section>
+
+{% if foco_hoy %}
+<section class="focus-today">
+  <span class="focus-tag">Foco de hoy</span>
+  <p><strong>{{ foco_hoy.nombre }}</strong> — {{ foco_hoy.motivo }} Resolver esto hoy es tu 1% de mejora.</p>
+</section>
+{% endif %}
+
+<section class="summary-row" aria-label="Resumen de cartera">
+  <div class="summary-chip chip-score">
+    <span class="chip-count">{{ rendimiento.salud_general }}%</span>
+    <span class="chip-label">Salud general</span>
+    {% if rendimiento.tiene_historial %}
+      <span class="chip-trend trend-{{ 'up' if rendimiento.delta > 0 else ('down' if rendimiento.delta < 0 else 'flat') }}">
+        {{ '▲' if rendimiento.delta > 0 else ('▼' if rendimiento.delta < 0 else '＝') }}
+        {{ rendimiento.delta if rendimiento.delta > 0 else -rendimiento.delta }} pts
+      </span>
+    {% else %}
+      <span class="chip-trend trend-flat">primera medición</span>
+    {% endif %}
+  </div>
+  <div class="summary-chip chip-rojo">
+    <span class="chip-count">{{ resumen.rojo }}</span>
+    <span class="chip-label">En riesgo</span>
+  </div>
+  <div class="summary-chip chip-amarillo">
+    <span class="chip-count">{{ resumen.amarillo }}</span>
+    <span class="chip-label">A monitorear</span>
+  </div>
+  <div class="summary-chip chip-verde">
+    <span class="chip-count">{{ resumen.verde }}</span>
+    <span class="chip-label">Saludables</span>
+  </div>
+  <div class="summary-chip chip-total">
+    <span class="chip-count">{{ resumen.total }}</span>
+    <span class="chip-label">Cuentas activas</span>
+  </div>
+</section>
+
+<section class="list" aria-label="Listado de cuentas">
+  {% if clientes|length == 0 %}
+    <p class="empty">No hay cuentas cargadas todavía. Sumá la primera con "Nueva cuenta".</p>
+  {% endif %}
+
+  {% for c in clientes %}
+  <details class="account-row">
+    <summary>
+      <span class="row-id">
+        <span class="row-name">{{ c.nombre }}</span>
+        <span class="badge-plan plan-{{ c.plan|lower }}">{{ c.plan }}</span>
+      </span>
+      <span class="row-contact">{{ c.contacto }}</span>
+      <span class="risk-tag estado-{{ c.estado }}">{{ c.estado|capitalize }}</span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+
+    <div class="account-body">
+      <div class="account-metrics">
+        <div class="metric">
+          <span class="metric-value">
+            {% if c.dias_a_renovacion >= 0 %}{{ c.dias_a_renovacion }}{% else %}{{ -c.dias_a_renovacion }}{% endif %}
+          </span>
+          <span class="metric-label">
+            {% if c.dias_a_renovacion >= 0 %}días a renovación{% else %}días vencida{% endif %}
+          </span>
+        </div>
+        <div class="metric">
+          <span class="metric-value">{{ c.dias_sin_contacto }}</span>
+          <span class="metric-label">días sin contacto</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value">{{ c.tickets_abiertos }}</span>
+          <span class="metric-label">tickets abiertos</span>
+        </div>
+        <div class="metric">
+          {% if c.valoracion.cantidad > 0 %}
+            <span class="metric-value">★ {{ c.valoracion.promedio }}</span>
+            <span class="metric-label">{{ c.valoracion.cantidad }} valoración{{ 'es' if c.valoracion.cantidad != 1 else '' }}</span>
+          {% else %}
+            <span class="metric-value metric-empty">—</span>
+            <span class="metric-label">sin valoraciones</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <p class="account-suggestion"><strong>Próximo paso:</strong> {{ c.sugerencia }}</p>
+      {% if c.notas %}<p class="account-notes">{{ c.notas }}</p>{% endif %}
+
+      <div class="account-actions">
+        <a class="btn btn-ghost" href="{{ url_for('valorar_cliente', cliente_id=c.id) }}" target="_blank">Ver formulario de valoración</a>
+        <a class="btn btn-ghost" href="{{ url_for('editar_cliente', cliente_id=c.id) }}">Editar</a>
+        <form method="POST" action="{{ url_for('eliminar_cliente', cliente_id=c.id) }}" onsubmit="return confirm('¿Eliminar esta cuenta del panel?');">
+          <button class="btn btn-ghost btn-danger" type="submit">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </details>
+  {% endfor %}
+</section>
+{% endblock %}
