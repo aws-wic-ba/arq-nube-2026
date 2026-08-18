@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Donaciones - Fundación Hospital Pediátrico Oncológico</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 40px 16px;
+    color: #1f2933;
+  }
+  .card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 32px;
+  }
+  h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+    color: #0b4f6c;
+  }
+  p.subtitle {
+    color: #6b7280;
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 16px;
+    color: #374151;
+  }
+  input[type="text"], input[type="email"], select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #0b4f6c;
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .checkbox-row label {
+    margin: 0;
+    font-weight: 400;
+  }
+  button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 12px;
+    background: #0b4f6c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: #08384d; }
+  button:disabled { background: #9ca3af; cursor: not-allowed; }
+  #resultado {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+  }
+  #resultado.success {
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    color: #065f46;
+    display: block;
+  }
+  #resultado.error {
+    background: #fef2f2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+    display: block;
+  }
+  .id-generado {
+    font-family: monospace;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Registro de Donante</h1>
+  <p class="subtitle">Fundación Hospital Pediátrico Oncológico — Módulo de Donaciones</p>
+
+  <form id="formDonacion">
+    <label for="nombre">Nombre / Razón social</label>
+    <input type="text" id="nombre" required placeholder="Ej: María Pérez">
+
+    <label for="tipo_donante">Tipo de donante</label>
+    <select id="tipo_donante" required>
+      <option value="persona">Persona natural</option>
+      <option value="empresa">Empresa</option>
+    </select>
+
+    <label for="identificacion">Identificación (cédula / RIF)</label>
+    <input type="text" id="identificacion" required placeholder="Ej: V12345678">
+
+    <label for="correo">Correo electrónico</label>
+    <input type="email" id="correo" required placeholder="Ej: maria@correo.com">
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="es_anonimo">
+      <label for="es_anonimo">Deseo donar de forma anónima (no mostrar mi nombre públicamente)</label>
+    </div>
+
+    <button type="submit" id="btnEnviar">Registrar donante</button>
+  </form>
+
+  <div id="resultado"></div>
+</div>
+
+<script>
+  // URL de tu API Gateway (endpoint real conectado a Lambda + DynamoDB)
+  const API_URL = "https://c8lujqmpjl.execute-api.us-east-1.amazonaws.com/donantes";
+
+  const form = document.getElementById('formDonacion');
+  const resultadoDiv = document.getElementById('resultado');
+  const btnEnviar = document.getElementById('btnEnviar');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const datos = {
+      nombre: document.getElementById('nombre').value,
+      tipo_donante: document.getElementById('tipo_donante').value,
+      identificacion: document.getElementById('identificacion').value,
+      correo: document.getElementById('correo').value,
+      es_anonimo: document.getElementById('es_anonimo').checked
+    };
+
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = "Enviando...";
+    resultadoDiv.className = "";
+    resultadoDiv.style.display = "none";
+
+    try {
+      const respuesta = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+      });
+
+      const data = await respuesta.json();
+
+      if (respuesta.ok) {
+        resultadoDiv.className = "success";
+        resultadoDiv.innerHTML =
+          "✅ " + data.mensaje +
+          "<br>ID generado: <span class='id-generado'>" + data.Donante_id + "</span>";
+        form.reset();
+      } else {
+        resultadoDiv.className = "error";
+        resultadoDiv.textContent = "❌ Ocurrió un error: " + (data.mensaje || respuesta.status);
+      }
+    } catch (err) {
+      resultadoDiv.className = "error";
+      resultadoDiv.textContent = "❌ No se pudo conectar con el servidor: " + err.message;
+    }
+
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = "Registrar donante";
+  });
+</script>
+
+</body>
+</html>
