@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Mi panel{% endblock %}
+{% block content %}
+<div class="card">
+    <div>Saldo disponible</div>
+    <div class="balance">${{ "%.2f"|format(balance) }}</div>
+    <a class="btn" href="{{ url_for('new_request') }}">+ Nueva solicitud</a>
+</div>
+
+<div class="card">
+    <h3>Mis solicitudes</h3>
+    {% if requests %}
+    <table>
+        <tr><th></th><th>Item</th><th>Monto</th><th>Categoría</th><th>Estado</th><th>Nota</th></tr>
+        {% for r in requests %}
+        <tr>
+            <td>
+                {% if r.image_filename %}
+                <img class="request-thumb-sm" src="{{ url_for('static', filename='uploads/' + r.image_filename) }}" alt="">
+                {% endif %}
+            </td>
+            <td>{{ r.item }}</td>
+            <td>
+                ${{ "%.2f"|format(r.amount) }}
+                {% if r.approved_amount and r.approved_amount < r.amount %}
+                <br><small>Acreditado: ${{ "%.2f"|format(r.approved_amount) }}</small>
+                {% endif %}
+            </td>
+            <td>{{ r.category }}</td>
+            <td><span class="badge {{ r.status }}">
+                {% if r.status == 'pending' %}Pendiente
+                {% elif r.status == 'approved' %}Aprobada
+                {% else %}Rechazada{% endif %}
+            </span></td>
+            <td><small>{{ r.parent_note or "" }}</small></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Todavía no hiciste ninguna solicitud.</p>
+    {% endif %}
+</div>
+{% endblock %}

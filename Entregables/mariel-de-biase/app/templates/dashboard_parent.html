@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Panel de Mariel{% endblock %}
+{% block content %}
+
+<div class="child-selector">
+    <a href="{{ url_for('dashboard') }}" class="child-chip {% if not selected_id %}active{% endif %}">Todos</a>
+    {% for c in children %}
+    <a href="{{ url_for('dashboard', child_id=c.id) }}" class="child-chip {% if selected_id == c.id %}active{% endif %}">
+        {{ c.name }}
+    </a>
+    {% endfor %}
+</div>
+
+<div class="tabs">
+    <button class="tab-btn active" data-tab="pending" onclick="showTab('pending')">
+        Pendientes {% if pending %}<span class="tab-count">{{ pending|length }}</span>{% endif %}
+    </button>
+    <button class="tab-btn" data-tab="history" onclick="showTab('history')">Historial</button>
+    <button class="tab-btn" data-tab="metrics" onclick="showTab('metrics')">📊 Métricas</button>
+</div>
+
+<div id="tab-pending" class="tab-panel">
+    <div class="card">
+        {% if pending %}
+            {% for r in pending %}
+            <div class="request-block">
+                <div class="request-info">
+                    {% if r.image_filename %}
+                    <img class="request-thumb" src="{{ url_for('static', filename='uploads/' + r.image_filename) }}" alt="{{ r.item }}">
+                    {% endif %}
+                    <div>
+                        <strong>{{ r.teen.name }}</strong> quiere comprar <strong>{{ r.item }}</strong>
+                        por <strong>${{ "%.2f"|format(r.amount) }}</strong> ({{ r.category }})
+                        {% if r.link_or_note %}<br><small>{{ r.link_or_note }}</small>{% endif %}
+                    </div>
+                </div>
+
+                <div class="request-actions">
+                    <form method="POST" action="{{ url_for('approve_request', request_id=r.id) }}" class="inline-form">
+                        <label>Aprobar por (dejalo igual para aprobar el monto completo)</label>
+                        <input type="number" step="0.01" min="0.01" max="{{ r.amount }}" name="approved_amount" value="{{ r.amount }}">
+                        <input type="text" name="parent_note" placeholder="Comentario opcional (ej: 'aprobado, pero para el mes que viene')">
+                        <button type="submit">Aprobar</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('reject_request', request_id=r.id) }}" class="inline-form">
+                        <input type="text" name="parent_note" placeholder="Motivo o alternativa (ej: 'pedí uno de $5000 en vez de esto')">
+                        <button type="submit" class="reject">Rechazar</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p>No hay solicitudes pendientes.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div id="tab-history" class="tab-panel" style="display:none;">
+    <div class="card">
+        {% if history %}
+        <table>
+            <tr><th>Hijo/a</th><th>Item</th><th>Pedido</th><th>Acreditado</th><th>Estado</th><th>Nota</th></tr>
+            {% for r in history %}
+            <tr>
+                <td>{{ r.teen.name }}</td>
+                <td>{{ r.item }}</td>
+                <td>${{ "%.2f"|format(r.amount) }}</td>
+                <td>{% if r.approved_amount %}${{ "%.2f"|format(r.approved_amount) }}{% else %}—{% endif %}</td>
+                <td><span class="badge {{ r.status }}">
+                    {% if r.status == 'approved' %}Aprobada{% else %}Rechazada{% endif %}
+                </span></td>
+                <td><small>{{ r.parent_note or "" }}</small></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>Todavía no hay historial.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div id="tab-metrics" class="tab-panel" style="display:none;">
+    <div class="card">
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Pedido este mes</div>
+                <div class="metric-value">${{ "%.2f"|format(metrics.total_requested) }}</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Acreditado este mes</div>
+                <div class="metric-value">${{ "%.2f"|format(metrics.total_approved) }}</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Solicitudes este mes</div>
+                <div class="metric-value">{{ metrics.count_this_month }}</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">% aprobación</div>
+                <div class="metric-value">
+                    {% if metrics.approval_rate is not none %}{{ metrics.approval_rate }}%{% else %}—{% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if metrics.category_breakdown %}
+        <h4 style="margin-top:20px;">Gasto pedido por categoría</h4>
+        {% for c in metrics.category_breakdown %}
+        <div class="cat-row">
+            <div class="cat-label">{{ c.category }} <small>(${{ "%.2f"|format(c.amount) }})</small></div>
+            <div class="cat-bar-bg">
+                <div class="cat-bar" style="width: {{ c.pct }}%;"></div>
+            </div>
+            <div class="cat-pct">{{ c.pct }}%</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color:#888;">Todavía no hay solicitudes este mes.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function showTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + name).style.display = 'block';
+    document.querySelector('.tab-btn[data-tab="' + name + '"]').classList.add('active');
+}
+</script>
+{% endblock %}
