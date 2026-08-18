@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: roversec
+      DB_PASSWORD: roversec
+      DB_NAME: roversec
+    depends_on:
+      - db
+    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: roversec
+      POSTGRES_PASSWORD: roversec
+      POSTGRES_DB: roversec
+    volumes:
+      - datos_db:/var/lib/postgresql/data
+    restart: unless-stopped
+volumes:
+  datos_db:

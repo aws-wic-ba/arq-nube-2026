@@ -1,0 +1,353 @@
+:root {
+  --ink: #1a2332;
+  --muted: #7b8794;
+  --paper: #f5f7fa;
+  --card: #ffffff;
+  --green: #1f6feb;
+  --green-deep: #1a5fd0;
+  --soft: #e7effb;
+  --accent: #06b6d4;
+  --line: #dfe4ea;
+  --radius: 18px;
+  --shadow: 0 6px 22px rgba(38, 49, 58, 0.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Nunito", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.5;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* --- Header --- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  font-size: 1.6rem;
+  color: var(--green-deep);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo span { color: var(--accent); }
+
+.cart-link {
+  position: relative;
+  font-family: "Fredoka", sans-serif;
+  font-weight: 500;
+  background: var(--soft);
+  color: var(--green-deep);
+  padding: 10px 18px;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+.cart-link:hover { background: #d9efe2; }
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Hero --- */
+.hero {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 8px;
+}
+.hero h1 {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  font-size: 2.4rem;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+.hero p { color: var(--muted); margin: 0; font-size: 1.05rem; }
+
+/* --- Filtros --- */
+.filtros {
+  max-width: 1080px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+  display: flex;
+  gap: 10px;
+}
+.filtro {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  padding: 9px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.filtro:hover { border-color: var(--green); }
+.filtro.activo {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+/* --- Grilla de productos --- */
+.grid {
+  max-width: 1080px;
+  margin: 24px auto 60px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+.card-emoji {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  margin-bottom: 14px;
+}
+.card-tag {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--green-deep);
+  background: var(--soft);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin: 0 0 6px;
+}
+.card p { font-size: 0.85rem; color: var(--muted); margin: 0 0 16px; flex: 1; }
+.card-precio {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+/* --- Botones --- */
+.btn {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 11px 18px;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--green); color: #fff; width: 100%; }
+.btn-primary:hover { background: var(--green-deep); }
+.btn-ghost { background: var(--soft); color: var(--green-deep); }
+.btn-ghost:hover { background: #d9efe2; }
+
+/* --- Carrito --- */
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+.wrap h1 {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  margin: 0 0 24px;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.item-emoji {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+.item-info { flex: 1; }
+.item-info h4 { font-family: "Fredoka", sans-serif; font-weight: 500; margin: 0 0 2px; font-size: 1rem; }
+.item-info span { color: var(--muted); font-size: 0.85rem; }
+.stepper { display: flex; align-items: center; gap: 10px; }
+.stepper button {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+.stepper button:hover { border-color: var(--green); }
+.item-sub { font-family: "Fredoka", sans-serif; font-weight: 600; min-width: 90px; text-align: right; }
+.item-del {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 1.3rem; line-height: 1;
+}
+.item-del:hover { color: #d9534f; }
+
+.resumen {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 8px;
+}
+.resumen-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.resumen-total .accent { color: var(--accent); }
+
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; }
+.form-row input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.form-row input:focus { outline: none; border-color: var(--green); }
+
+.vacio {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.vacio .big { font-size: 3rem; margin-bottom: 12px; }
+
+.ok {
+  text-align: center;
+  padding: 50px 24px;
+  background: var(--soft);
+  border-radius: var(--radius);
+}
+.ok .big { font-size: 3rem; margin-bottom: 10px; }
+.ok h2 { font-family: "Fredoka", sans-serif; margin: 0 0 8px; color: var(--green-deep); }
+.ok p { color: var(--ink); margin: 4px 0; }
+
+@media (max-width: 520px) {
+  .hero h1 { font-size: 1.9rem; }
+  .item { flex-wrap: wrap; }
+  .item-sub { min-width: auto; }
+}
+
+/* --- Etiqueta por tipo --- */
+.card-tag.personalizado { color: #a15b1e; background: #fbeee0; }
+.card-tag.generico { color: var(--green-deep); background: var(--soft); }
+
+/* --- Hint y textarea --- */
+.hint { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
+.form-row textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--line);
+  border-radius: 12px; font-family: inherit; font-size: 0.9rem; resize: vertical;
+}
+.form-row select {
+  width: 100%; padding: 11px 12px; border: 1.5px solid var(--line);
+  border-radius: 12px; font-family: inherit; font-size: 0.95rem; background: #fff;
+}
+.form-row input[type="file"] { font-size: 0.85rem; }
+
+/* --- Modal --- */
+.modal-fondo {
+  position: fixed; inset: 0; background: rgba(38, 49, 58, 0.45);
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+}
+.modal {
+  background: var(--card); border-radius: var(--radius); padding: 24px;
+  width: 100%; max-width: 420px; position: relative; box-shadow: var(--shadow);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-cerrar {
+  position: absolute; top: 12px; right: 14px; border: none; background: none;
+  font-size: 1.6rem; cursor: pointer; color: var(--muted); line-height: 1;
+}
+.modal-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.modal-emoji {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--soft);
+  display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0;
+}
+.modal-head h3 { font-family: "Fredoka", sans-serif; font-weight: 500; margin: 0; font-size: 1.1rem; }
+.modal-precio { font-family: "Fredoka", sans-serif; font-weight: 600; color: var(--accent); font-size: 1.2rem; }
+
+/* --- Foto en el carrito --- */
+.item-foto {
+  width: 56px; height: 56px; border-radius: 12px; object-fit: cover; flex-shrink: 0;
+  border: 1px solid var(--line);
+}
+.item-ops { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+/* Etiquetas por nivel (Roversec) */
+.card-tag.inicial { color: #1a5fd0; background: #e7effb; }
+.card-tag.intermedio { color: #a15b1e; background: #fbeee0; }
+.card-tag.avanzado { color: #b23b5e; background: #fbe6ee; }
+.card-tag { text-transform: capitalize; }
