@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roversec — Cursos de Ciberseguridad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="logo">🛡️ Rover<span>sec</span></a>
+      <a href="carrito.html" class="cart-link">Carrito <span class="cart-badge" id="cart-badge">0</span></a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Formate en ciberseguridad</h1>
+    <p>Cursos prácticos de hacking ético, cloud security, análisis de malware y más. Aprendé a tu ritmo, desde cualquier lugar.</p>
+  </section>
+
+  <div class="filtros" id="filtros">
+    <button class="filtro activo" data-nivel="">Todos</button>
+    <button class="filtro" data-nivel="inicial">Inicial</button>
+    <button class="filtro" data-nivel="intermedio">Intermedio</button>
+    <button class="filtro" data-nivel="avanzado">Avanzado</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <script src="app.js"></script>
+  <script>
+    const grid = document.getElementById("grid");
+    const filtros = document.getElementById("filtros");
+    let cache = [];
+
+    function tarjeta(c) {
+      return `
+        <article class="card">
+          <div class="card-emoji">${c.emoji}</div>
+          <span class="card-tag ${c.nivel}">${c.nivel} · ${c.duracion}</span>
+          <h3>${c.titulo}</h3>
+          <p>${c.descripcion}</p>
+          <div class="card-precio">${formatoPrecio(c.precio)}</div>
+          <button class="btn btn-primary" data-id="${c.id}">Agregar al carrito</button>
+        </article>`;
+    }
+    async function cargar(nivel = "") {
+      const url = nivel ? `/api/cursos?nivel=${nivel}` : "/api/cursos";
+      cache = await (await fetch(url)).json();
+      grid.innerHTML = cache.map(tarjeta).join("");
+    }
+    filtros.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filtro");
+      if (!btn) return;
+      document.querySelectorAll(".filtro").forEach((f) => f.classList.remove("activo"));
+      btn.classList.add("activo");
+      cargar(btn.dataset.nivel);
+    });
+    grid.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-id]");
+      if (!btn) return;
+      const c = cache.find((x) => x.id === Number(btn.dataset.id));
+      const agregado = agregarAlCarrito({ id: c.id, titulo: c.titulo, precio: c.precio, emoji: c.emoji, nivel: c.nivel, duracion: c.duracion });
+      btn.textContent = agregado ? "¡Agregado! ✓" : "Ya está en el carrito";
+      setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
+    });
+    actualizarBadge();
+    cargar();
+  </script>
+</body>
+</html>

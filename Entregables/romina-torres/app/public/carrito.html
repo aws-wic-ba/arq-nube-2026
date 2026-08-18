@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrito — Roversec</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="logo">🛡️ Rover<span>sec</span></a>
+      <a href="index.html" class="cart-link">← Seguir explorando</a>
+    </div>
+  </header>
+  <main class="wrap" id="wrap">
+    <h1>Tu carrito</h1>
+    <div id="contenido"></div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const contenido = document.getElementById("contenido");
+    function fila(i) {
+      return `
+        <div class="item" data-id="${i.id}">
+          <div class="item-emoji">${i.emoji}</div>
+          <div class="item-info">
+            <h4>${i.titulo}</h4>
+            <span>${i.nivel} · ${i.duracion}</span>
+          </div>
+          <div class="item-sub">${formatoPrecio(i.precio)}</div>
+          <button class="item-del" data-accion="borrar" title="Quitar">×</button>
+        </div>`;
+    }
+    function render() {
+      const items = leerCarrito();
+      if (items.length === 0) {
+        contenido.innerHTML = `<div class="vacio"><div class="big">🛡️</div><p>Tu carrito está vacío.</p>
+          <a href="index.html" class="btn btn-ghost" style="display:inline-block;margin-top:12px;">Ver cursos</a></div>`;
+        return;
+      }
+      const total = items.reduce((a, i) => a + i.precio, 0);
+      contenido.innerHTML = `
+        ${items.map(fila).join("")}
+        <div class="resumen">
+          <div class="resumen-total"><span>Total</span><span class="accent">${formatoPrecio(total)}</span></div>
+          <div class="form-row"><label for="nombre">Nombre y apellido</label><input id="nombre" type="text" placeholder="Ej: Ana Pérez" /></div>
+          <div class="form-row"><label for="email">Email</label><input id="email" type="email" placeholder="ana@ejemplo.com" /></div>
+          <button class="btn btn-primary" id="confirmar">Confirmar compra</button>
+        </div>`;
+    }
+    contenido.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const item = btn.closest(".item");
+      if (item && btn.dataset.accion === "borrar") {
+        guardarCarrito(leerCarrito().filter((x) => x.id !== Number(item.dataset.id)));
+        return render();
+      }
+      if (btn.id === "confirmar") {
+        const nombre = document.getElementById("nombre").value.trim();
+        const email = document.getElementById("email").value.trim();
+        if (!nombre || !email) { alert("Completá tu nombre y email."); return; }
+        btn.disabled = true; btn.textContent = "Procesando...";
+        try {
+          const res = await fetch("/api/compras", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cliente_nombre: nombre, cliente_email: email, items: leerCarrito().map((i) => ({ id: i.id })) }),
+          });
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          localStorage.removeItem(CART_KEY);
+          contenido.innerHTML = `<div class="ok"><div class="big">🎓✅</div><h2>¡Compra confirmada!</h2>
+            <p>Compra <strong>#${data.compra_id}</strong> registrada.</p>
+            <p>Total: <strong>${formatoPrecio(data.total)}</strong></p>
+            <p style="color:var(--muted);font-size:0.9rem;">Vas a recibir el acceso a tus cursos por email.</p>
+            <a href="index.html" class="btn btn-ghost" style="display:inline-block;margin-top:16px;">Volver</a></div>`;
+          actualizarBadge();
+        } catch { btn.disabled = false; btn.textContent = "Confirmar compra"; alert("No se pudo registrar la compra."); }
+      }
+    });
+    actualizarBadge(); render();
+  </script>
+</body>
+</html>
