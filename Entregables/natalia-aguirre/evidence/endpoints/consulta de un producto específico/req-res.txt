@@ -1,0 +1,10 @@
+curl -i -X GET https://catalogo-app.com/products/PROD-100
+
+HTTP/1.1 200 OK
+Date: Fri, 07 Aug 2026 23:02:14 GMT
+Content-Type: application/json
+Content-Length: 129
+Connection: keep-alive
+Server: uvicorn
+
+{"product_id":"PROD-100","name":"Monitor Gamer 4K","description":"Monitor IPS de 27 pulgadas 144Hz","price":349.99,"stock":8}
